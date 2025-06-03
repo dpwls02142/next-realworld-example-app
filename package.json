@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "author": "reck1ess",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 4000",
     "build": "next build",
-    "start": "next start"
+    "start": "next start -p 4000"
   },
   "dependencies": {
     "axios": "^0.19.2",

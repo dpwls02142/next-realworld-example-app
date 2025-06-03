@@ -1,4 +1,4 @@
-export const SERVER_BASE_URL = `https://conduit.productionready.io/api`;
+export const SERVER_BASE_URL = `http://localhost:8000/api`;
 
 export const APP_NAME = `conduit`;
 
