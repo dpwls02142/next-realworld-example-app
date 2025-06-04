@@ -3,8 +3,8 @@ import { useRouter } from "next/router";
 import React from "react";
 import useSWR from "swr";
 
-import ArticleMeta from "../../components/article/ArticleMeta";
-import CommentList from "../../components/comment/CommentList";
+import ArticleMeta from "../../features/article/ArticleMeta";
+import CommentList from "../../features/comment/CommentList";
 import ArticleAPI from "../../lib/api/article";
 import { Article } from "../../lib/types/articleType";
 import { SERVER_BASE_URL } from "../../lib/utils/constant";

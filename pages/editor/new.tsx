@@ -2,8 +2,8 @@ import Router from "next/router";
 import React from "react";
 import useSWR from "swr";
 
-import ListErrors from "../../components/common/ListErrors";
-import TagInput from "../../components/editor/TagInput";
+import ListErrors from "../../shared/components/ListErrors";
+import TagInput from "../../features/editor/TagInput";
 import ArticleAPI from "../../lib/api/article";
 import storage from "../../lib/utils/storage";
 import editorReducer from "../../lib/utils/editorReducer";

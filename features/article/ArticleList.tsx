@@ -3,10 +3,10 @@ import React from "react";
 import useSWR from "swr";
 
 import ArticlePreview from "./ArticlePreview";
-import ErrorMessage from "../common/ErrorMessage";
-import LoadingSpinner from "../common/LoadingSpinner";
-import Maybe from "../common/Maybe";
-import Pagination from "../common/Pagination";
+import ErrorMessage from "../../shared/components/ErrorMessage";
+import LoadingSpinner from "../../shared/components/LoadingSpinner";
+import Maybe from "../../shared/components/Maybe";
+import Pagination from "../../shared/components/Pagination";
 import { usePageState } from "../../lib/context/PageContext";
 import {
   usePageCountState,

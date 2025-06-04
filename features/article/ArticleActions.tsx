@@ -2,12 +2,12 @@ import Router, { useRouter } from "next/router";
 import React from "react";
 import useSWR, { trigger } from "swr";
 
-import CustomLink from "../common/CustomLink";
+import CustomLink from "../../shared/components/CustomLink";
 import checkLogin from "../../lib/utils/checkLogin";
 import ArticleAPI from "../../lib/api/article";
 import { SERVER_BASE_URL } from "../../lib/utils/constant";
 import storage from "../../lib/utils/storage";
-import Maybe from "../common/Maybe";
+import Maybe from "../../shared/components/Maybe";
 
 const ArticleActions = ({ article }) => {
   const { data: currentUser } = useSWR("user", storage);

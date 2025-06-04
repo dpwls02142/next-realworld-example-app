@@ -4,8 +4,8 @@ import Router from "next/router";
 import React from "react";
 import useSWR from "swr";
 
-import CustomLink from "../common/CustomLink";
-import CustomImage from "../common/CustomImage";
+import CustomLink from "../../shared/components/CustomLink";
+import CustomImage from "../../shared/components/CustomImage";
 import { usePageDispatch } from "../../lib/context/PageContext";
 import checkLogin from "../../lib/utils/checkLogin";
 import { SERVER_BASE_URL } from "../../lib/utils/constant";

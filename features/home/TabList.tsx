@@ -2,9 +2,9 @@ import { useRouter } from "next/router";
 import React from "react";
 import useSWR from "swr";
 
-import CustomLink from "../common/CustomLink";
-import Maybe from "../common/Maybe";
-import NavLink from "../common/NavLink";
+import CustomLink from "../../shared/components/CustomLink";
+import Maybe from "../../shared/components/Maybe";
+import NavLink from "../../shared/ui/layout/NavLink";
 import checkLogin from "../../lib/utils/checkLogin";
 import storage from "../../lib/utils/storage";
 

@@ -1,12 +1,12 @@
 import React from "react";
 import useSWR from "swr";
 
-import CustomLink from "./CustomLink";
-import Maybe from "./Maybe";
+import CustomLink from "../../components/CustomLink";
+import Maybe from "../../components/Maybe";
 import NavLink from "./NavLink";
-import { usePageDispatch } from "../../lib/context/PageContext";
-import checkLogin from "../../lib/utils/checkLogin";
-import storage from "../../lib/utils/storage";
+import { usePageDispatch } from "../../../lib/context/PageContext";
+import checkLogin from "../../../lib/utils/checkLogin";
+import storage from "../../../lib/utils/storage";
 
 const Navbar = () => {
   const setPage = usePageDispatch();

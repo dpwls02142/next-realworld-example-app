@@ -4,8 +4,8 @@ import useSWR from "swr";
 
 import Comment from "./Comment";
 import CommentInput from "./CommentInput";
-import ErrorMessage from "../common/ErrorMessage";
-import LoadingSpinner from "../common/LoadingSpinner";
+import ErrorMessage from "../../shared/components/ErrorMessage";
+import LoadingSpinner from "../../shared/components/LoadingSpinner";
 
 import { CommentType } from "../../lib/types/commentType";
 import { SERVER_BASE_URL } from "../../lib/utils/constant";

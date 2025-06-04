@@ -2,7 +2,7 @@ import Router from "next/router";
 import React from "react";
 import { mutate } from "swr";
 
-import ListErrors from "../common/ListErrors";
+import ListErrors from "../../shared/components/ListErrors";
 import UserAPI from "../../lib/api/user";
 
 const RegisterForm = () => {

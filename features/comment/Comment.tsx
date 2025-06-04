@@ -1,9 +1,9 @@
 import React from "react";
 import useSWR from "swr";
 
-import CustomLink from "../common/CustomLink";
-import CustomImage from "../common/CustomImage";
-import Maybe from "../common/Maybe";
+import CustomLink from "../../shared/components/CustomLink";
+import CustomImage from "../../shared/components/CustomImage";
+import Maybe from "../../shared/components/Maybe";
 import DeleteButton from "./DeleteButton";
 import checkLogin from "../../lib/utils/checkLogin";
 import storage from "../../lib/utils/storage";

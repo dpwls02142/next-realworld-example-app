@@ -3,8 +3,8 @@ import { useRouter } from "next/router";
 import React from "react";
 import useSWR, { trigger } from "swr";
 
-import CustomImage from "../common/CustomImage";
-import CustomLink from "../common/CustomLink";
+import CustomImage from "../../shared/components/CustomImage";
+import CustomLink from "../../shared/components/CustomLink";
 import checkLogin from "../../lib/utils/checkLogin";
 import { SERVER_BASE_URL } from "../../lib/utils/constant";
 import storage from "../../lib/utils/storage";

@@ -2,7 +2,7 @@ import Router from "next/router";
 import React from "react";
 import useSWR, { mutate, trigger } from "swr";
 
-import SettingsForm from "../../components/profile/SettingsForm";
+import SettingsForm from "../../features/profile/SettingsForm";
 import checkLogin from "../../lib/utils/checkLogin";
 import storage from "../../lib/utils/storage";
 
