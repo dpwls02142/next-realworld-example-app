@@ -9,6 +9,7 @@ import ArticleAPI from "../../lib/api/article";
 import { SERVER_BASE_URL } from "../../lib/utils/constant";
 import editorReducer from "../../lib/utils/editorReducer";
 import storage from "../../lib/utils/storage";
+import validateArticle from "lib/utils/validateArticle";
 
 const UpdateArticleEditor = ({ article: initialArticle }) => {
   const initialState = {
@@ -39,25 +40,13 @@ const UpdateArticleEditor = ({ article: initialArticle }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-        const missingFields = [];
+    const errorMessage = validateArticle(posting);
 
-    if (!posting.title.trim()) {
-      missingFields.push("제목");
-    }
-
-    if (!posting.description.trim()) {
-      missingFields.push("설명");
-    }
-
-    if (!posting.body.trim()) {
-      missingFields.push("본문");
-    }
-
-    if (missingFields.length > 0) {
-      alert(`${missingFields.join(", ")}을(를) 입력해주세요.`);
+    if (errorMessage) {
+      alert(errorMessage);
       return;
     }
-    
+
     setLoading(true);
 
     const { data, status } = await axios.put(

@@ -7,6 +7,7 @@ import TagInput from "../../features/editor/TagInput";
 import ArticleAPI from "../../lib/api/article";
 import storage from "../../lib/utils/storage";
 import editorReducer from "../../lib/utils/editorReducer";
+import validateArticle from "lib/utils/validateArticle";
 
 const PublishArticleEditor = () => {
   const initialState = {
@@ -33,22 +34,10 @@ const PublishArticleEditor = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const missingFields = [];
+    const errorMessage = validateArticle(posting);
 
-    if (!posting.title.trim()) {
-      missingFields.push("제목");
-    }
-
-    if (!posting.description.trim()) {
-      missingFields.push("설명");
-    }
-
-    if (!posting.body.trim()) {
-      missingFields.push("본문");
-    }
-
-    if (missingFields.length > 0) {
-      alert(`${missingFields.join(", ")}을(를) 입력해주세요.`);
+    if (errorMessage) {
+      alert(errorMessage);
       return;
     }
 
