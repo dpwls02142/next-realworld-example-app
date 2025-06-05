@@ -9,6 +9,7 @@ import ArticleAPI from "../../lib/api/article";
 import { SERVER_BASE_URL } from "../../lib/utils/constant";
 import editorReducer from "../../lib/utils/editorReducer";
 import storage from "../../lib/utils/storage";
+import validateArticle from "lib/utils/validateArticle";
 
 const UpdateArticleEditor = ({ article: initialArticle }) => {
   const initialState = {
@@ -38,6 +39,14 @@ const UpdateArticleEditor = ({ article: initialArticle }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const errorMessage = validateArticle(posting);
+
+    if (errorMessage) {
+      alert(errorMessage);
+      return;
+    }
+
     setLoading(true);
 
     const { data, status } = await axios.put(

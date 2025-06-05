@@ -65,21 +65,31 @@ const ArticleAPI = {
   },
 
   create: async (article, token) => {
-    const { data, status } = await axios.post(
-      `${SERVER_BASE_URL}/articles`,
-      JSON.stringify({ article }),
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Token ${encodeURIComponent(token)}`,
-        },
+    try {
+      const { data, status } = await axios.post(
+        `${SERVER_BASE_URL}/articles`,
+        JSON.stringify({ article }),
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Token ${encodeURIComponent(token)}`,
+          },
+        }
+      );
+      return {
+        data,
+        status,
+      };
+    } catch (error) {
+      if (error.response) {
+        console.log("400 에러:", error.response.data);
+      } else {
+        console.log("기타 에러:", error.message);
       }
-    );
-    return {
-      data,
-      status,
-    };
+      throw error;
+    }
   },
+
 };
 
 export default ArticleAPI;

@@ -7,6 +7,7 @@ import TagInput from "../../features/editor/TagInput";
 import ArticleAPI from "../../lib/api/article";
 import storage from "../../lib/utils/storage";
 import editorReducer from "../../lib/utils/editorReducer";
+import validateArticle from "lib/utils/validateArticle";
 
 const PublishArticleEditor = () => {
   const initialState = {
@@ -32,6 +33,14 @@ const PublishArticleEditor = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const errorMessage = validateArticle(posting);
+
+    if (errorMessage) {
+      alert(errorMessage);
+      return;
+    }
+
     setLoading(true);
 
     const { data, status } = await ArticleAPI.create(
