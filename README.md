@@ -53,12 +53,9 @@
 - Docker (백엔드 실행용)
 
 ### Backend 실행
-```bash
-# Docker 설치 후 실행
-docker run -d -p 8000:8000 --name realworld-backend realworldio/django-drf
-# 서버 확인
-curl http://localhost:8000/api/
-```
+[해당 레포](https://github.com/c4ffein/realworld-django-ninja) 
+clone 후
+docker로 실행
 
 ### Frontend 실행
 ```bash
