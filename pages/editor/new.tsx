@@ -32,6 +32,26 @@ const PublishArticleEditor = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const missingFields = [];
+
+    if (!posting.title.trim()) {
+      missingFields.push("제목");
+    }
+
+    if (!posting.description.trim()) {
+      missingFields.push("설명");
+    }
+
+    if (!posting.body.trim()) {
+      missingFields.push("본문");
+    }
+
+    if (missingFields.length > 0) {
+      alert(`${missingFields.join(", ")}을(를) 입력해주세요.`);
+      return;
+    }
+
     setLoading(true);
 
     const { data, status } = await ArticleAPI.create(
