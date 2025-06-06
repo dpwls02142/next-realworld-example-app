@@ -1,10 +1,9 @@
-import React from "react";
+import React from 'react';
 
 const ListErrors = ({ errors }) => {
-  if (!errors || typeof errors !== "object"){
-    return null
-  }
-  else{
+  if (!errors || typeof errors !== 'object') {
+    return null;
+  } else {
     return (
       <ul className="error-messages">
         {Object.keys(errors).map((key) => (
@@ -16,6 +15,5 @@ const ListErrors = ({ errors }) => {
     );
   }
 };
-
 
 export default ListErrors;

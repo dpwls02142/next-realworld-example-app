@@ -1,7 +1,7 @@
-import React from "react";
+import React from 'react';
 
 const TagInput = ({ tagList, addTag, removeTag }) => {
-  const [tag, setTag] = React.useState("");
+  const [tag, setTag] = React.useState('');
 
   const changeTagInput = (e) => setTag(e.target.value);
 
@@ -21,7 +21,7 @@ const TagInput = ({ tagList, addTag, removeTag }) => {
   const handleAddTag = () => {
     if (!!tag) {
       addTag(tag);
-      setTag("");
+      setTag('');
     }
   };
 

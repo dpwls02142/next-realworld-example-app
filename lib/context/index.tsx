@@ -1,7 +1,7 @@
-import React from "react";
+import React from 'react';
 
-import PageContext from "./PageContext";
-import PageCountContext from "./PageCountContext";
+import PageContext from './PageContext';
+import PageCountContext from './PageCountContext';
 
 const ContextProvider = ({ children }) => (
   <PageContext>

@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 export type PageCountDispatch = React.Dispatch<any>;
 
@@ -7,7 +7,7 @@ interface Props {
 }
 
 const PageCountStateContext = React.createContext<number | undefined>(
-  undefined
+  undefined,
 );
 
 const PageCountDispatchContext = React.createContext<

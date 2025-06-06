@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 const useViewport = () => {
   const [vw, setVW] = React.useState(0);
@@ -16,8 +16,8 @@ const useViewport = () => {
     };
 
     setSizes();
-    window.addEventListener("resize", setSizes);
-    return () => window.removeEventListener("resize", setSizes);
+    window.addEventListener('resize', setSizes);
+    return () => window.removeEventListener('resize', setSizes);
   }, [vh, vw]);
 
   return { vw, vh };

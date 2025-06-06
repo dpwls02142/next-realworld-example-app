@@ -1,9 +1,9 @@
-import Head from "next/head";
-import React from "react";
+import Head from 'next/head';
+import React from 'react';
 
-import Banner from "../features/home/Banner";
-import MainView from "../features/home/MainView";
-import Tags from "../features/home/Tags";
+import Banner from '../features/home/Banner';
+import MainView from '../features/home/MainView';
+import Tags from '../features/home/Tags';
 
 const Home = () => (
   <>

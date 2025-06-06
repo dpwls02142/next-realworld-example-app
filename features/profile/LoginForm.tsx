@@ -1,23 +1,23 @@
-import Router from "next/router";
-import React from "react";
-import { mutate } from "swr";
+import Router from 'next/router';
+import React from 'react';
+import { mutate } from 'swr';
 
-import ListErrors from "../../shared/components/ListErrors";
-import UserAPI from "../../lib/api/user";
+import ListErrors from '../../shared/components/ListErrors';
+import UserAPI from '../../lib/api/user';
 
 const LoginForm = () => {
   const [isLoading, setLoading] = React.useState(false);
   const [errors, setErrors] = React.useState([]);
-  const [email, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
 
   const handleEmailChange = React.useCallback(
     (e) => setEmail(e.target.value),
-    []
+    [],
   );
   const handlePasswordChange = React.useCallback(
     (e) => setPassword(e.target.value),
-    []
+    [],
   );
 
   const handleSubmit = async (e) => {
@@ -31,9 +31,9 @@ const LoginForm = () => {
       }
 
       if (data?.user) {
-        window.localStorage.setItem("user", JSON.stringify(data.user));
-        mutate("user", data?.user);
-        Router.push("/");
+        window.localStorage.setItem('user', JSON.stringify(data.user));
+        mutate('user', data?.user);
+        Router.push('/');
       }
     } catch (error) {
       console.error(error);

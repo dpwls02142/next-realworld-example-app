@@ -1,35 +1,35 @@
-import Router from "next/router";
-import React from "react";
-import useSWR from "swr";
+import Router from 'next/router';
+import React from 'react';
+import useSWR from 'swr';
 
-import ListErrors from "../../shared/components/ListErrors";
-import TagInput from "../../features/editor/TagInput";
-import ArticleAPI from "../../lib/api/article";
-import storage from "../../lib/utils/storage";
-import editorReducer from "../../lib/utils/editorReducer";
-import validateArticle from "lib/utils/validateArticle";
+import ListErrors from '../../shared/components/ListErrors';
+import TagInput from '../../features/editor/TagInput';
+import ArticleAPI from '../../lib/api/article';
+import storage from '../../lib/utils/storage';
+import editorReducer from '../../lib/utils/editorReducer';
+import validateArticle from 'lib/utils/validateArticle';
 
 const PublishArticleEditor = () => {
   const initialState = {
-    title: "",
-    description: "",
-    body: "",
+    title: '',
+    description: '',
+    body: '',
     tagList: [],
   };
 
   const [isLoading, setLoading] = React.useState(false);
   const [errors, setErrors] = React.useState([]);
   const [posting, dispatch] = React.useReducer(editorReducer, initialState);
-  const { data: currentUser } = useSWR("user", storage);
+  const { data: currentUser } = useSWR('user', storage);
 
   const handleTitle = (e) =>
-    dispatch({ type: "SET_TITLE", text: e.target.value });
+    dispatch({ type: 'SET_TITLE', text: e.target.value });
   const handleDescription = (e) =>
-    dispatch({ type: "SET_DESCRIPTION", text: e.target.value });
+    dispatch({ type: 'SET_DESCRIPTION', text: e.target.value });
   const handleBody = (e) =>
-    dispatch({ type: "SET_BODY", text: e.target.value });
-  const addTag = (tag) => dispatch({ type: "ADD_TAG", tag: tag });
-  const removeTag = (tag) => dispatch({ type: "REMOVE_TAG", tag: tag });
+    dispatch({ type: 'SET_BODY', text: e.target.value });
+  const addTag = (tag) => dispatch({ type: 'ADD_TAG', tag: tag });
+  const removeTag = (tag) => dispatch({ type: 'REMOVE_TAG', tag: tag });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -45,7 +45,7 @@ const PublishArticleEditor = () => {
 
     const { data, status } = await ArticleAPI.create(
       posting,
-      currentUser?.token
+      currentUser?.token,
     );
 
     setLoading(false);
@@ -54,7 +54,7 @@ const PublishArticleEditor = () => {
       setErrors(data.errors);
     }
 
-    Router.push("/");
+    Router.push('/');
   };
 
   return (

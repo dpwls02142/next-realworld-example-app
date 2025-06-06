@@ -1,14 +1,14 @@
-import marked from "marked";
-import { useRouter } from "next/router";
-import React from "react";
-import useSWR from "swr";
+import marked from 'marked';
+import { useRouter } from 'next/router';
+import React from 'react';
+import useSWR from 'swr';
 
-import ArticleMeta from "../../features/article/ArticleMeta";
-import CommentList from "../../features/comment/CommentList";
-import ArticleAPI from "../../lib/api/article";
-import { Article } from "../../lib/types/articleType";
-import { SERVER_BASE_URL } from "../../lib/utils/constant";
-import fetcher from "../../lib/utils/fetcher";
+import ArticleMeta from '../../features/article/ArticleMeta';
+import CommentList from '../../features/comment/CommentList';
+import ArticleAPI from '../../lib/api/article';
+import { Article } from '../../lib/types/articleType';
+import { SERVER_BASE_URL } from '../../lib/utils/constant';
+import fetcher from '../../lib/utils/fetcher';
 
 const ArticlePage = (initialArticle) => {
   const router = useRouter();
@@ -16,12 +16,10 @@ const ArticlePage = (initialArticle) => {
     query: { pid },
   } = router;
 
-  const {
-    data: fetchedArticle,
-  } = useSWR(
+  const { data: fetchedArticle } = useSWR(
     `${SERVER_BASE_URL}/articles/${encodeURIComponent(String(pid))}`,
     fetcher,
-    { initialData: initialArticle }
+    { initialData: initialArticle },
   );
 
   const { article }: Article = fetchedArticle || initialArticle;

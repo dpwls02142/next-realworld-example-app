@@ -1,10 +1,10 @@
-import axios from "axios";
+import axios from 'axios';
 
-import { SERVER_BASE_URL } from "../utils/constant";
+import { SERVER_BASE_URL } from '../utils/constant';
 
 const UserAPI = {
   current: async () => {
-    const user: any = window.localStorage.getItem("user");
+    const user: any = window.localStorage.getItem('user');
     const token = user?.token;
     try {
       const response = await axios.get(`/user`, {
@@ -24,9 +24,9 @@ const UserAPI = {
         JSON.stringify({ user: { email, password } }),
         {
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
-        }
+        },
       );
       return response;
     } catch (error) {
@@ -40,9 +40,9 @@ const UserAPI = {
         JSON.stringify({ user: { username, email, password } }),
         {
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
-        }
+        },
       );
       return response;
     } catch (error) {
@@ -56,9 +56,9 @@ const UserAPI = {
         JSON.stringify({ user }),
         {
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
-        }
+        },
       );
       return response;
     } catch (error) {
@@ -66,7 +66,7 @@ const UserAPI = {
     }
   },
   follow: async (username) => {
-    const user: any = JSON.parse(window.localStorage.getItem("user"));
+    const user: any = JSON.parse(window.localStorage.getItem('user'));
     const token = user?.token;
     try {
       const response = await axios.post(
@@ -76,7 +76,7 @@ const UserAPI = {
           headers: {
             Authorization: `Token ${encodeURIComponent(token)}`,
           },
-        }
+        },
       );
       return response;
     } catch (error) {
@@ -84,7 +84,7 @@ const UserAPI = {
     }
   },
   unfollow: async (username) => {
-    const user: any = JSON.parse(window.localStorage.getItem("user"));
+    const user: any = JSON.parse(window.localStorage.getItem('user'));
     const token = user?.token;
     try {
       const response = await axios.delete(
@@ -93,7 +93,7 @@ const UserAPI = {
           headers: {
             Authorization: `Token ${encodeURIComponent(token)}`,
           },
-        }
+        },
       );
       return response;
     } catch (error) {

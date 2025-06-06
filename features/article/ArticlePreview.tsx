@@ -1,18 +1,18 @@
-import axios from "axios";
-import Link from "next/link";
-import Router from "next/router";
-import React from "react";
-import useSWR from "swr";
+import axios from 'axios';
+import Link from 'next/link';
+import Router from 'next/router';
+import React from 'react';
+import useSWR from 'swr';
 
-import CustomLink from "../../shared/components/CustomLink";
-import CustomImage from "../../shared/components/CustomImage";
-import { usePageDispatch } from "../../lib/context/PageContext";
-import checkLogin from "../../lib/utils/checkLogin";
-import { SERVER_BASE_URL } from "../../lib/utils/constant";
-import storage from "../../lib/utils/storage";
+import CustomLink from '../../shared/components/CustomLink';
+import CustomImage from '../../shared/components/CustomImage';
+import { usePageDispatch } from '../../lib/context/PageContext';
+import checkLogin from '../../lib/utils/checkLogin';
+import { SERVER_BASE_URL } from '../../lib/utils/constant';
+import storage from '../../lib/utils/storage';
 
-const FAVORITED_CLASS = "btn btn-sm btn-primary";
-const NOT_FAVORITED_CLASS = "btn btn-sm btn-outline-primary";
+const FAVORITED_CLASS = 'btn btn-sm btn-primary';
+const NOT_FAVORITED_CLASS = 'btn btn-sm btn-outline-primary';
 
 const ArticlePreview = ({ article }) => {
   const setPage = usePageDispatch();
@@ -21,7 +21,7 @@ const ArticlePreview = ({ article }) => {
   const [hover, setHover] = React.useState(false);
   const [currentIndex, setCurrentIndex] = React.useState(-1);
 
-  const { data: currentUser } = useSWR("user", storage);
+  const { data: currentUser } = useSWR('user', storage);
   const isLoggedIn = checkLogin(currentUser);
 
   const handleClickFavorite = async (slug) => {
@@ -53,7 +53,7 @@ const ArticlePreview = ({ article }) => {
             headers: {
               Authorization: `Token ${currentUser?.token}`,
             },
-          }
+          },
         );
       }
     } catch (error) {
@@ -70,7 +70,7 @@ const ArticlePreview = ({ article }) => {
   if (!article) return;
 
   return (
-    <div className="article-preview" style={{ padding: "1.5rem 0.5rem" }}>
+    <div className="article-preview" style={{ padding: '1.5rem 0.5rem' }}>
       <div className="article-meta">
         <CustomLink
           href="/profile/[pid]"
@@ -115,7 +115,7 @@ const ArticlePreview = ({ article }) => {
         <h1>{preview.title}</h1>
         <p>{preview.description}</p>
         <span>Read more...</span>
-        <ul className="tag-list" style={{ maxWidth: "100%" }}>
+        <ul className="tag-list" style={{ maxWidth: '100%' }}>
           {preview.tagList.map((tag, index) => {
             return (
               <Link href={`/?tag=${tag}`} as={`/?tag=${tag}`} key={index}>
@@ -132,13 +132,13 @@ const ArticlePreview = ({ article }) => {
                   }}
                   style={{
                     borderColor:
-                      hover && currentIndex === index ? "#5cb85c" : "initial",
+                      hover && currentIndex === index ? '#5cb85c' : 'initial',
                   }}
                 >
                   <span
                     style={{
                       color:
-                        hover && currentIndex === index ? "#5cb85c" : "inherit",
+                        hover && currentIndex === index ? '#5cb85c' : 'inherit',
                     }}
                     onClick={() => setPage(0)}
                   >

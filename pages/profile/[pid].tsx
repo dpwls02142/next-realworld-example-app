@@ -1,19 +1,19 @@
-import { useRouter } from "next/router";
-import React from "react";
-import useSWR, { mutate, trigger } from "swr";
+import { useRouter } from 'next/router';
+import React from 'react';
+import useSWR, { mutate, trigger } from 'swr';
 
-import ArticleList from "../../features/article/ArticleList";
-import CustomImage from "../../shared/components/CustomImage";
-import ErrorMessage from "../../shared/components/ErrorMessage";
-import Maybe from "../../shared/components/Maybe";
-import EditProfileButton from "../../features/profile/EditProfileButton";
-import FollowUserButton from "../../features/profile/FollowUserButton";
-import ProfileTab from "../../features/profile/ProfileTab";
-import UserAPI from "../../lib/api/user";
-import checkLogin from "../../lib/utils/checkLogin";
-import { SERVER_BASE_URL } from "../../lib/utils/constant";
-import fetcher from "../../lib/utils/fetcher";
-import storage from "../../lib/utils/storage";
+import ArticleList from '../../features/article/ArticleList';
+import CustomImage from '../../shared/components/CustomImage';
+import ErrorMessage from '../../shared/components/ErrorMessage';
+import Maybe from '../../shared/components/Maybe';
+import EditProfileButton from '../../features/profile/EditProfileButton';
+import FollowUserButton from '../../features/profile/FollowUserButton';
+import ProfileTab from '../../features/profile/ProfileTab';
+import UserAPI from '../../lib/api/user';
+import checkLogin from '../../lib/utils/checkLogin';
+import { SERVER_BASE_URL } from '../../lib/utils/constant';
+import fetcher from '../../lib/utils/fetcher';
+import storage from '../../lib/utils/storage';
 
 const Profile = ({ initialProfile }) => {
   const router = useRouter();
@@ -21,13 +21,10 @@ const Profile = ({ initialProfile }) => {
     query: { pid },
   } = router;
 
-  const {
-    data: fetchedProfile,
-    error: profileError,
-  } = useSWR(
+  const { data: fetchedProfile, error: profileError } = useSWR(
     `${SERVER_BASE_URL}/profiles/${encodeURIComponent(String(pid))}`,
     fetcher,
-    { initialData: initialProfile }
+    { initialData: initialProfile },
   );
 
   if (profileError) return <ErrorMessage message="Can't load profile" />;
@@ -35,7 +32,7 @@ const Profile = ({ initialProfile }) => {
   const { profile } = fetchedProfile || initialProfile;
   const { username, bio, image, following } = profile;
 
-  const { data: currentUser } = useSWR("user", storage);
+  const { data: currentUser } = useSWR('user', storage);
   const isLoggedIn = checkLogin(currentUser);
   const isUser = currentUser && username === currentUser?.username;
 
@@ -43,7 +40,7 @@ const Profile = ({ initialProfile }) => {
     mutate(
       `${SERVER_BASE_URL}/profiles/${pid}`,
       { profile: { ...profile, following: true } },
-      false
+      false,
     );
     UserAPI.follow(pid);
     trigger(`${SERVER_BASE_URL}/profiles/${pid}`);
@@ -53,7 +50,7 @@ const Profile = ({ initialProfile }) => {
     mutate(
       `${SERVER_BASE_URL}/profiles/${pid}`,
       { profile: { ...profile, following: true } },
-      true
+      true,
     );
     UserAPI.unfollow(pid);
     trigger(`${SERVER_BASE_URL}/profiles/${pid}`);

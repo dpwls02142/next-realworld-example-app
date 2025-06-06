@@ -1,15 +1,15 @@
-import { useRouter } from "next/router";
-import React from "react";
-import useSWR from "swr";
+import { useRouter } from 'next/router';
+import React from 'react';
+import useSWR from 'swr';
 
-import Comment from "./Comment";
-import CommentInput from "./CommentInput";
-import ErrorMessage from "../../shared/components/ErrorMessage";
-import LoadingSpinner from "../../shared/components/LoadingSpinner";
+import Comment from './Comment';
+import CommentInput from './CommentInput';
+import ErrorMessage from '../../shared/components/ErrorMessage';
+import LoadingSpinner from '../../shared/components/LoadingSpinner';
 
-import { CommentType } from "../../lib/types/commentType";
-import { SERVER_BASE_URL } from "../../lib/utils/constant";
-import fetcher from "../../lib/utils/fetcher";
+import { CommentType } from '../../lib/types/commentType';
+import { SERVER_BASE_URL } from '../../lib/utils/constant';
+import fetcher from '../../lib/utils/fetcher';
 
 const CommentList = () => {
   const router = useRouter();
@@ -19,7 +19,7 @@ const CommentList = () => {
 
   const { data, error } = useSWR(
     `${SERVER_BASE_URL}/articles/${pid}/comments`,
-    fetcher
+    fetcher,
   );
 
   if (!data) {

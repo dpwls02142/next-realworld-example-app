@@ -1,7 +1,7 @@
-import axios from "axios";
+import axios from 'axios';
 
 const updateOptions = () => {
-  if (typeof window === "undefined") return {};
+  if (typeof window === 'undefined') return {};
 
   if (!window.localStorage.user) return {};
 

@@ -1,9 +1,9 @@
-import React from "react";
-import { trigger } from "swr";
+import React from 'react';
+import { trigger } from 'swr';
 
-import { getRange, getPageInfo } from "../../lib/utils/calculatePagination";
-import { usePageDispatch, usePageState } from "../../lib/context/PageContext";
-import Maybe from "./Maybe";
+import { getRange, getPageInfo } from '../../lib/utils/calculatePagination';
+import { usePageDispatch, usePageState } from '../../lib/context/PageContext';
+import Maybe from './Maybe';
 
 interface PaginationProps {
   total: number;
@@ -39,7 +39,7 @@ const Pagination = ({
       setPage(index);
       trigger(fetchURL);
     },
-    []
+    [],
   );
 
   const handleFirstClick = React.useCallback(
@@ -48,7 +48,7 @@ const Pagination = ({
       setPage(0);
       trigger(fetchURL);
     },
-    []
+    [],
   );
 
   const handlePrevClick = React.useCallback(
@@ -57,7 +57,7 @@ const Pagination = ({
       setPage(page - 1);
       trigger(fetchURL);
     },
-    []
+    [],
   );
 
   const handleNextClick = React.useCallback(
@@ -66,7 +66,7 @@ const Pagination = ({
       setPage(page + 1);
       trigger(fetchURL);
     },
-    []
+    [],
   );
 
   const handleLastClick = React.useCallback(
@@ -75,7 +75,7 @@ const Pagination = ({
       setPage(lastIndex);
       trigger(fetchURL);
     },
-    []
+    [],
   );
 
   return (
@@ -95,7 +95,7 @@ const Pagination = ({
           return (
             <li
               key={page.toString()}
-              className={isCurrent ? "page-item active" : "page-item"}
+              className={isCurrent ? 'page-item active' : 'page-item'}
               onClick={(e) => handleClick(e, page)}
             >
               <a className="page-link">{page + 1}</a>

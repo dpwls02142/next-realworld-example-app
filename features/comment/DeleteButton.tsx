@@ -1,12 +1,12 @@
-import axios from "axios";
-import { useRouter } from "next/router";
-import useSWR, { trigger } from "swr";
+import axios from 'axios';
+import { useRouter } from 'next/router';
+import useSWR, { trigger } from 'swr';
 
-import { SERVER_BASE_URL } from "../../lib/utils/constant";
-import storage from "../../lib/utils/storage";
+import { SERVER_BASE_URL } from '../../lib/utils/constant';
+import storage from '../../lib/utils/storage';
 
 const DeleteButton = ({ commentId }) => {
-  const { data: currentUser } = useSWR("user", storage);
+  const { data: currentUser } = useSWR('user', storage);
   const router = useRouter();
   const {
     query: { pid },
@@ -19,7 +19,7 @@ const DeleteButton = ({ commentId }) => {
         headers: {
           Authorization: `Token ${currentUser?.token}`,
         },
-      }
+      },
     );
     trigger(`${SERVER_BASE_URL}/articles/${pid}/comments`);
   };

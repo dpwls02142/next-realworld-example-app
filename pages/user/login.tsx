@@ -1,14 +1,17 @@
-import Head from "next/head";
-import React from "react";
+import Head from 'next/head';
+import React from 'react';
 
-import CustomLink from "../../shared/components/CustomLink";
-import LoginForm from "../../features/profile/LoginForm";
+import CustomLink from '../../shared/components/CustomLink';
+import LoginForm from '../../features/profile/LoginForm';
 
 const Login = () => (
   <>
     <Head>
       <title>LOGIN | NEXT REALWORLD</title>
-      <meta name="description" content="Please login to use fully-featured next-realworld site. (Post articles, comments, and like, follow etc.)" />
+      <meta
+        name="description"
+        content="Please login to use fully-featured next-realworld site. (Post articles, comments, and like, follow etc.)"
+      />
     </Head>
     <div className="auth-page">
       <div className="container page">

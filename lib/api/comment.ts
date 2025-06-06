@@ -1,13 +1,13 @@
-import axios from "axios";
+import axios from 'axios';
 
-import { SERVER_BASE_URL } from "../utils/constant";
+import { SERVER_BASE_URL } from '../utils/constant';
 
 const CommentAPI = {
   create: async (slug, comment) => {
     try {
       const response = await axios.post(
         `${SERVER_BASE_URL}/articles/${slug}/comments`,
-        JSON.stringify({ comment })
+        JSON.stringify({ comment }),
       );
       return response;
     } catch (error) {
@@ -17,7 +17,7 @@ const CommentAPI = {
   delete: async (slug, commentId) => {
     try {
       const response = await axios.delete(
-        `${SERVER_BASE_URL}/articles/${slug}/comments/${commentId}`
+        `${SERVER_BASE_URL}/articles/${slug}/comments/${commentId}`,
       );
       return response;
     } catch (error) {

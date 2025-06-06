@@ -12,16 +12,16 @@ function validateArticle(article: ArticleFields): string | null {
   const body = article.body.trim();
 
   if (!title) {
-    missingFields.push("제목")
+    missingFields.push('제목');
   }
   if (!description) {
-    missingFields.push("설명")
+    missingFields.push('설명');
   }
   if (!body) {
-    missingFields.push("본문")
+    missingFields.push('본문');
   }
   if (missingFields.length > 0) {
-    return `${missingFields.join(", ")}을(를) 입력해주세요.`;
+    return `${missingFields.join(', ')}을(를) 입력해주세요.`;
   }
 
   return null;

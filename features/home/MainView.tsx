@@ -1,7 +1,7 @@
-import React from "react";
+import React from 'react';
 
-import TabList from "./TabList";
-import ArticleList from "../article/ArticleList";
+import TabList from './TabList';
+import ArticleList from '../article/ArticleList';
 
 const MainView = () => (
   <div className="col-md-9">

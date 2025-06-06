@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 const FollowUserButton = ({
   isUser,
@@ -19,13 +19,13 @@ const FollowUserButton = ({
   return (
     <button
       className={`btn btn-sm action-btn ${
-        following ? "btn-secondary" : "btn-outline-secondary"
+        following ? 'btn-secondary' : 'btn-outline-secondary'
       }`}
       onClick={handleClick}
     >
       <i className="ion-plus-round" />
       &nbsp;
-      {following ? "Unfollow" : "Follow"} {username}
+      {following ? 'Unfollow' : 'Follow'} {username}
     </button>
   );
 };

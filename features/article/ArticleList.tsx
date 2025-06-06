@@ -1,20 +1,20 @@
-import { useRouter } from "next/router";
-import React from "react";
-import useSWR from "swr";
+import { useRouter } from 'next/router';
+import React from 'react';
+import useSWR from 'swr';
 
-import ArticlePreview from "./ArticlePreview";
-import ErrorMessage from "../../shared/components/ErrorMessage";
-import LoadingSpinner from "../../shared/components/LoadingSpinner";
-import Maybe from "../../shared/components/Maybe";
-import Pagination from "../../shared/components/Pagination";
-import { usePageState } from "../../lib/context/PageContext";
+import ArticlePreview from './ArticlePreview';
+import ErrorMessage from '../../shared/components/ErrorMessage';
+import LoadingSpinner from '../../shared/components/LoadingSpinner';
+import Maybe from '../../shared/components/Maybe';
+import Pagination from '../../shared/components/Pagination';
+import { usePageState } from '../../lib/context/PageContext';
 import {
   usePageCountState,
   usePageCountDispatch,
-} from "../../lib/context/PageCountContext";
-import useViewport from "../../lib/hooks/useViewport";
-import { SERVER_BASE_URL, DEFAULT_LIMIT } from "../../lib/utils/constant";
-import fetcher from "../../lib/utils/fetcher";
+} from '../../lib/context/PageCountContext';
+import useViewport from '../../lib/hooks/useViewport';
+import { SERVER_BASE_URL, DEFAULT_LIMIT } from '../../lib/utils/constant';
+import fetcher from '../../lib/utils/fetcher';
 
 const ArticleList = () => {
   const page = usePageState();
@@ -40,12 +40,12 @@ const ArticleList = () => {
       break;
     case isProfilePage && !!favorite:
       fetchURL = `${SERVER_BASE_URL}/articles?favorited=${encodeURIComponent(
-        String(pid)
+        String(pid),
       )}&offset=${page * DEFAULT_LIMIT}`;
       break;
     case isProfilePage && !favorite:
       fetchURL = `${SERVER_BASE_URL}/articles?author=${encodeURIComponent(
-        String(pid)
+        String(pid),
       )}&offset=${page * DEFAULT_LIMIT}`;
       break;
     case !isProfilePage && !!follow:
