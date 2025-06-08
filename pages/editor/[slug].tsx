@@ -1,4 +1,3 @@
-import axios from 'axios';
 import Router, { useRouter } from 'next/router';
 import { useState, useReducer, ChangeEvent, FormEvent } from 'react';
 import useSWR from 'swr';
@@ -6,7 +5,6 @@ import useSWR from 'swr';
 import ListErrors from '../../shared/components/ListErrors';
 import TagInput from '../../features/editor/TagInput';
 import ArticleAPI from '../../lib/api/article';
-import { SERVER_BASE_URL } from '../../lib/utils/constant';
 import editorReducer from '../../lib/utils/editorReducer';
 import storage from '../../lib/utils/storage';
 import validateArticle from 'lib/utils/validateArticle';
@@ -53,16 +51,11 @@ const UpdateArticleEditor = ({ article: initialArticle }) => {
 
     setLoading(true);
 
-    const { data, status } = await axios.put(
-      `${SERVER_BASE_URL}/articles/${slug}`,
-      JSON.stringify({ article: posting }),
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Token ${encodeURIComponent(currentUser?.token)}`,
-        },
-      },
+    const { data, status } = await ArticleAPI.update(
+      { ...posting, slug },
+      currentUser?.token,
     );
+
     setLoading(false);
 
     if (status !== 200) {
