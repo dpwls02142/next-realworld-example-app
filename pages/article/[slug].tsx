@@ -10,7 +10,21 @@ import { Article } from '../../lib/types/articleType';
 import { SERVER_BASE_URL } from '../../lib/utils/constant';
 import fetcher from '../../lib/utils/fetcher';
 
-const ArticleBanner = ({ title, article }) => (
+interface ArticleBannerProps {
+  title: string;
+  article: Article;
+}
+
+interface ArticleBodyProps {
+  htmlContent: { __html: string };
+  tags: string[];
+}
+
+interface ArticlePageProps {
+  initialArticle: { article: Article };
+}
+
+const ArticleBanner = ({ title, article }: ArticleBannerProps) => (
   <div className="banner">
     <div className="container">
       <h1>{title}</h1>
@@ -19,20 +33,19 @@ const ArticleBanner = ({ title, article }) => (
   </div>
 );
 
-const ArticleContent = ({ htmlContent }) => (
-  <div className="col-xs-12">
-    <div dangerouslySetInnerHTML={htmlContent} />
+const ArticleBody = ({ htmlContent, tags }: ArticleBodyProps) => (
+  <div className="row article-content">
+    <div className="col-xs-12">
+      <div dangerouslySetInnerHTML={htmlContent} />
+      <ul className="tag-list">
+        {tags.map((tag) => (
+          <li key={tag} className="tag-default tag-pill tag-outline">
+            {tag}
+          </li>
+        ))}
+      </ul>
+    </div>
   </div>
-);
-
-const TagList = ({ tags }) => (
-  <ul className="tag-list">
-    {tags.map((tag) => (
-      <li key={tag} className="tag-default tag-pill tag-outline">
-        {tag}
-      </li>
-    ))}
-  </ul>
 );
 
 const CommentsSection = () => (
@@ -43,10 +56,9 @@ const CommentsSection = () => (
   </div>
 );
 
-const ArticlePage = (initialArticle) => {
+const ArticlePage = ({ initialArticle }: ArticlePageProps) => {
   const router = useRouter();
-  const {
-    query: { slug },
+  const { query: { slug },
   } = router;
 
   const { data: fetchedArticle } = useSWR(
@@ -55,7 +67,8 @@ const ArticlePage = (initialArticle) => {
     { initialData: initialArticle },
   );
 
-  const { article }: Article = fetchedArticle || initialArticle;
+  const articleData = fetchedArticle || initialArticle;
+  const { article } = articleData;
 
   const htmlContent = {
     __html: marked(article.body, { sanitize: true }),
@@ -63,20 +76,15 @@ const ArticlePage = (initialArticle) => {
 
   return (
     <div className="article-page">
-
       <ArticleBanner title={article.title} article={article} />
 
       <div className="container page">
-        <div className="row article-content">
-          <ArticleContent htmlContent={htmlContent} />
-          <TagList tags={article.tagList} />
-        </div>
-        
-        <hr />
+        <ArticleBody htmlContent={htmlContent} tags={article.tagList} />
 
+        <hr />
         <div className="article-actions" />
+
         <CommentsSection />
-        
       </div>
     </div>
   );
