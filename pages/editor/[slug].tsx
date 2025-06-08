@@ -38,8 +38,8 @@ const UpdateArticleEditor = ({ article: initialArticle }) => {
   const handleBody = (e: TextareaChange) =>
     dispatch({ type: 'SET_BODY', text: e.target.value });
 
-  const addTag = (tag) => dispatch({ type: 'ADD_TAG', tag: tag });
-  const removeTag = (tag) => dispatch({ type: 'REMOVE_TAG', tag: tag });
+  const addTag = (tag: string) => dispatch({ type: 'ADD_TAG', tag: tag });
+  const removeTag = (tag: string) => dispatch({ type: 'REMOVE_TAG', tag: tag });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
