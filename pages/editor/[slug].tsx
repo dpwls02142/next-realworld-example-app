@@ -25,7 +25,7 @@ const UpdateArticleEditor = ({ article: initialArticle }) => {
   const { data: currentUser } = useSWR('user', storage);
   const router = useRouter();
   const {
-    query: { pid },
+    query: { slug },
   } = router;
 
   const handleTitle = (e) =>
@@ -50,7 +50,7 @@ const UpdateArticleEditor = ({ article: initialArticle }) => {
     setLoading(true);
 
     const { data, status } = await axios.put(
-      `${SERVER_BASE_URL}/articles/${pid}`,
+      `${SERVER_BASE_URL}/articles/${slug}`,
       JSON.stringify({ article: posting }),
       {
         headers: {
@@ -130,10 +130,10 @@ const UpdateArticleEditor = ({ article: initialArticle }) => {
   );
 };
 
-UpdateArticleEditor.getInitialProps = async ({ query: { pid } }) => {
+UpdateArticleEditor.getInitialProps = async ({ query: { slug } }) => {
   const {
     data: { article },
-  } = await ArticleAPI.get(pid);
+  } = await ArticleAPI.get(slug);
   return { article };
 };
 
