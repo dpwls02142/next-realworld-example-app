@@ -1,6 +1,6 @@
 import axios from 'axios';
 import Router, { useRouter } from 'next/router';
-import { useState, useReducer } from 'react';
+import { useState, useReducer, ChangeEvent } from 'react';
 import useSWR from 'swr';
 
 import ListErrors from '../../shared/components/ListErrors';
@@ -28,12 +28,16 @@ const UpdateArticleEditor = ({ article: initialArticle }) => {
     query: { slug },
   } = router;
 
-  const handleTitle = (e) =>
+  type InputChange = ChangeEvent<HTMLInputElement>;
+  type TextareaChange = ChangeEvent<HTMLTextAreaElement>;
+
+  const handleTitle = (e: InputChange) =>
     dispatch({ type: 'SET_TITLE', text: e.target.value });
-  const handleDescription = (e) =>
+  const handleDescription = (e: InputChange) =>
     dispatch({ type: 'SET_DESCRIPTION', text: e.target.value });
-  const handleBody = (e) =>
+  const handleBody = (e: TextareaChange) =>
     dispatch({ type: 'SET_BODY', text: e.target.value });
+
   const addTag = (tag) => dispatch({ type: 'ADD_TAG', tag: tag });
   const removeTag = (tag) => dispatch({ type: 'REMOVE_TAG', tag: tag });
 
