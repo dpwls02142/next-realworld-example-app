@@ -24,41 +24,48 @@ interface ArticlePageProps {
   initialArticle: { article: Article };
 }
 
-const ArticleBanner = ({ title, article }: ArticleBannerProps) => (
-  <div className="banner">
-    <div className="container">
-      <h1>{title}</h1>
-      <ArticleMeta article={article} />
+function ArticleBanner({ title, article }: ArticleBannerProps) {
+  return (
+    <div className="banner">
+      <div className="container">
+        <h1>{title}</h1>
+        <ArticleMeta article={article} />
+      </div>
     </div>
-  </div>
-);
+  );
+}
 
-const ArticleBody = ({ htmlContent, tags }: ArticleBodyProps) => (
-  <div className="row article-content">
-    <div className="col-xs-12">
-      <div dangerouslySetInnerHTML={htmlContent} />
-      <ul className="tag-list">
-        {tags.map((tag) => (
-          <li key={tag} className="tag-default tag-pill tag-outline">
-            {tag}
-          </li>
-        ))}
-      </ul>
+function ArticleBody({ htmlContent, tags }: ArticleBodyProps) {
+  return (
+    <div className="row article-content">
+      <div className="col-xs-12">
+        <div dangerouslySetInnerHTML={htmlContent} />
+        <ul className="tag-list">
+          {tags.map((tag) => (
+            <li key={tag} className="tag-default tag-pill tag-outline">
+              {tag}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
-  </div>
-);
+  );
+}
 
-const CommentsSection = () => (
-  <div className="row">
-    <div className="col-xs-12 col-md-8 offset-md-2">
-      <CommentList />
+function CommentsSection() {
+  return (
+    <div className="row">
+      <div className="col-xs-12 col-md-8 offset-md-2">
+        <CommentList />
+      </div>
     </div>
-  </div>
-);
+  );
+}
 
-const ArticlePage = ({ initialArticle }: ArticlePageProps) => {
+function ArticlePage({ initialArticle }: ArticlePageProps) {
   const router = useRouter();
-  const { query: { slug },
+  const {
+    query: { slug },
   } = router;
 
   const { data: fetchedArticle } = useSWR(
@@ -88,7 +95,7 @@ const ArticlePage = ({ initialArticle }: ArticlePageProps) => {
       </div>
     </div>
   );
-};
+}
 
 ArticlePage.getInitialProps = async ({ query: { slug } }) => {
   const { data } = await ArticleAPI.get(slug);
