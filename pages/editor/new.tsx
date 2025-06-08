@@ -1,5 +1,5 @@
 import Router from 'next/router';
-import { ChangeEvent, useReducer, useState } from 'react';
+import { ChangeEvent, FormEvent, useReducer, useState } from 'react';
 import useSWR from 'swr';
 
 import ListErrors from '../../shared/components/ListErrors';
@@ -35,7 +35,7 @@ const PublishArticleEditor = () => {
   const addTag = (tag: string) => dispatch({ type: 'ADD_TAG', tag: tag });
   const removeTag = (tag: string) => dispatch({ type: 'REMOVE_TAG', tag: tag });
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     const errorMessage = validateArticle(posting);

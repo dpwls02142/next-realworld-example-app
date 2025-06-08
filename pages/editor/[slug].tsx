@@ -1,6 +1,6 @@
 import axios from 'axios';
 import Router, { useRouter } from 'next/router';
-import { useState, useReducer, ChangeEvent } from 'react';
+import { useState, useReducer, ChangeEvent, FormEvent } from 'react';
 import useSWR from 'swr';
 
 import ListErrors from '../../shared/components/ListErrors';
@@ -41,7 +41,7 @@ const UpdateArticleEditor = ({ article: initialArticle }) => {
   const addTag = (tag: string) => dispatch({ type: 'ADD_TAG', tag: tag });
   const removeTag = (tag: string) => dispatch({ type: 'REMOVE_TAG', tag: tag });
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     const errorMessage = validateArticle(posting);
