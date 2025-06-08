@@ -1,21 +1,31 @@
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 import useSWR from 'swr';
 import Router from 'next/router';
 
-import storage from '../../lib/utils/storage';
 import ArticleAPI from '../../lib/api/article';
+import storage from '../../lib/utils/storage';
 import EditorForm, { ArticleInput } from '../../features/editor/EditorForm';
 
-const NewArticlePage = () => {
+export async function getServerSideProps({ query }) {
+  const { slug } = query;
+  const {
+    data: { article },
+  } = await ArticleAPI.get(slug);
+  return { props: { article } };
+}
+
+const EditArticlePage = ({ article }) => {
   const [errors, setErrors] = useState([]);
   const [isLoading, setLoading] = useState(false);
   const { data: currentUser } = useSWR('user', storage);
+  const { query } = useRouter();
 
   const handleSubmit = async (data: ArticleInput) => {
     setLoading(true);
 
-    const { data: res, status } = await ArticleAPI.create(
-      data,
+    const { data: res, status } = await ArticleAPI.update(
+      { ...data, slug: query.slug },
       currentUser?.token,
     );
 
@@ -31,16 +41,11 @@ const NewArticlePage = () => {
       <div className="row">
         <div className="col-md-10 offset-md-1 col-xs-12">
           <EditorForm
-            initialValues={{
-              title: '',
-              description: '',
-              body: '',
-              tagList: [],
-            }}
+            initialValues={article}
             isLoading={isLoading}
             errors={errors}
             onSubmit={handleSubmit}
-            submitLabel="Publish Article"
+            submitLabel="Update Article"
           />
         </div>
       </div>
@@ -48,4 +53,4 @@ const NewArticlePage = () => {
   );
 };
 
-export default NewArticlePage;
+export default EditArticlePage;
