@@ -6,23 +6,13 @@ import useSWR from 'swr';
 import ArticleMeta from '../../features/article/ArticleMeta';
 import CommentList from '../../features/comment/CommentList';
 import ArticleAPI from '../../lib/api/article';
-import { Article } from '../../lib/types/articleType';
+import {
+  ArticleBannerProps,
+  ArticleBodyProps,
+  ArticlePageProps,
+} from '../../lib/types/articleType';
 import { SERVER_BASE_URL } from '../../lib/utils/constant';
 import fetcher from '../../lib/utils/fetcher';
-
-interface ArticleBannerProps {
-  title: string;
-  article: Article;
-}
-
-interface ArticleBodyProps {
-  htmlContent: { __html: string };
-  tags: string[];
-}
-
-interface ArticlePageProps {
-  initialArticle: { article: Article };
-}
 
 function ArticleBanner({ title, article }: ArticleBannerProps) {
   return (
@@ -75,6 +65,7 @@ function ArticlePage({ initialArticle }: ArticlePageProps) {
   );
 
   const articleData = fetchedArticle || initialArticle;
+  if (!articleData) return <div>데이터 없음</div>;
   const { article } = articleData;
 
   const htmlContent = {

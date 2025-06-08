@@ -6,6 +6,20 @@ export interface Article {
   article: ArticleType;
 }
 
+export interface ArticleBannerProps {
+  title: string;
+  article: Article;
+}
+
+export interface ArticleBodyProps {
+  htmlContent: { __html: string };
+  tags: string[];
+}
+
+export interface ArticlePageProps {
+  initialArticle: { article: Article };
+}
+
 export type ArticleType = {
   tagList: string[];
   createdAt: number;
