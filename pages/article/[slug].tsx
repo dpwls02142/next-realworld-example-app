@@ -13,11 +13,11 @@ import fetcher from '../../lib/utils/fetcher';
 const ArticlePage = (initialArticle) => {
   const router = useRouter();
   const {
-    query: { pid },
+    query: { slug },
   } = router;
 
   const { data: fetchedArticle } = useSWR(
-    `${SERVER_BASE_URL}/articles/${encodeURIComponent(String(pid))}`,
+    `${SERVER_BASE_URL}/articles/${encodeURIComponent(String(slug))}`,
     fetcher,
     { initialData: initialArticle },
   );
@@ -61,8 +61,8 @@ const ArticlePage = (initialArticle) => {
   );
 };
 
-ArticlePage.getInitialProps = async ({ query: { pid } }) => {
-  const { data } = await ArticleAPI.get(pid);
+ArticlePage.getInitialProps = async ({ query: { slug } }) => {
+  const { data } = await ArticleAPI.get(slug);
   return data;
 };
 
