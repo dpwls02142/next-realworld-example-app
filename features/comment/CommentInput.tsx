@@ -14,7 +14,7 @@ const CommentInput = () => {
   const isLoggedIn = checkLogin(currentUser);
   const router = useRouter();
   const {
-    query: { pid },
+    query: { slug },
   } = router;
 
   const [content, setContent] = React.useState('');
@@ -28,7 +28,7 @@ const CommentInput = () => {
     e.preventDefault();
     setLoading(true);
     await axios.post(
-      `${SERVER_BASE_URL}/articles/${encodeURIComponent(String(pid))}/comments`,
+      `${SERVER_BASE_URL}/articles/${encodeURIComponent(String(slug))}/comments`,
       JSON.stringify({
         comment: {
           body: content,
@@ -43,7 +43,7 @@ const CommentInput = () => {
     );
     setLoading(false);
     setContent('');
-    trigger(`${SERVER_BASE_URL}/articles/${pid}/comments`);
+    trigger(`${SERVER_BASE_URL}/articles/${slug}/comments`);
   };
 
   if (!isLoggedIn) {

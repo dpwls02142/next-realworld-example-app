@@ -14,11 +14,11 @@ import fetcher from '../../lib/utils/fetcher';
 const CommentList = () => {
   const router = useRouter();
   const {
-    query: { pid },
+    query: { slug },
   } = router;
 
   const { data, error } = useSWR(
-    `${SERVER_BASE_URL}/articles/${pid}/comments`,
+    `${SERVER_BASE_URL}/articles/${slug}/comments`,
     fetcher,
   );
 

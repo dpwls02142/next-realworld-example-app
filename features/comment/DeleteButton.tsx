@@ -9,19 +9,19 @@ const DeleteButton = ({ commentId }) => {
   const { data: currentUser } = useSWR('user', storage);
   const router = useRouter();
   const {
-    query: { pid },
+    query: { slug },
   } = router;
 
   const handleDelete = async (commentId) => {
     await axios.delete(
-      `${SERVER_BASE_URL}/articles/${pid}/comments/${commentId}`,
+      `${SERVER_BASE_URL}/articles/${slug}/comments/${commentId}`,
       {
         headers: {
           Authorization: `Token ${currentUser?.token}`,
         },
       },
     );
-    trigger(`${SERVER_BASE_URL}/articles/${pid}/comments`);
+    trigger(`${SERVER_BASE_URL}/articles/${slug}/comments`);
   };
 
   return (
