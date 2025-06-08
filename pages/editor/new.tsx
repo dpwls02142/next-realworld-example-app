@@ -1,5 +1,5 @@
 import Router from 'next/router';
-import React from 'react';
+import { useReducer, useState } from 'react';
 import useSWR from 'swr';
 
 import ListErrors from '../../shared/components/ListErrors';
@@ -17,9 +17,9 @@ const PublishArticleEditor = () => {
     tagList: [],
   };
 
-  const [isLoading, setLoading] = React.useState(false);
-  const [errors, setErrors] = React.useState([]);
-  const [posting, dispatch] = React.useReducer(editorReducer, initialState);
+  const [isLoading, setLoading] = useState(false);
+  const [errors, setErrors] = useState([]);
+  const [posting, dispatch] = useReducer(editorReducer, initialState);
   const { data: currentUser } = useSWR('user', storage);
 
   const handleTitle = (e) =>
