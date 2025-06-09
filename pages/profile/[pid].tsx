@@ -49,8 +49,8 @@ function Profile({ initialProfile }) {
   const handleUnfollow = async () => {
     mutate(
       `${SERVER_BASE_URL}/profiles/${pid}`,
-      { profile: { ...profile, following: true } },
-      true,
+      { profile: { ...profile, following: false } },
+      false,
     );
     UserAPI.unfollow(pid);
     trigger(`${SERVER_BASE_URL}/profiles/${pid}`);
