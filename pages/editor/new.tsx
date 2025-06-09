@@ -6,7 +6,7 @@ import storage from '../../lib/utils/storage';
 import ArticleAPI from '../../lib/api/article';
 import EditorForm, { ArticleInput } from '../../features/editor/EditorForm';
 
-const NewArticlePage = () => {
+function NewArticlePage() {
   const [errors, setErrors] = useState([]);
   const [isLoading, setLoading] = useState(false);
   const { data: currentUser } = useSWR('user', storage);
@@ -46,6 +46,6 @@ const NewArticlePage = () => {
       </div>
     </div>
   );
-};
+}
 
 export default NewArticlePage;

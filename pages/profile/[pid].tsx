@@ -15,14 +15,15 @@ import { SERVER_BASE_URL } from '../../lib/utils/constant';
 import fetcher from '../../lib/utils/fetcher';
 import storage from '../../lib/utils/storage';
 
-const Profile = ({ initialProfile }) => {
+function Profile({ initialProfile }) {
   const router = useRouter();
   const {
     query: { pid },
   } = router;
+  const encodedUsername = encodeURIComponent(String(pid));
 
   const { data: fetchedProfile, error: profileError } = useSWR(
-    `${SERVER_BASE_URL}/profiles/${encodeURIComponent(String(pid))}`,
+    `${SERVER_BASE_URL}/profiles/${encodedUsername}`,
     fetcher,
     { initialData: initialProfile },
   );
@@ -36,25 +37,25 @@ const Profile = ({ initialProfile }) => {
   const isLoggedIn = checkLogin(currentUser);
   const isUser = currentUser && username === currentUser?.username;
 
-  const handleFollow = async () => {
+  async function handleFollow() {
     mutate(
-      `${SERVER_BASE_URL}/profiles/${pid}`,
+      `${SERVER_BASE_URL}/profiles/${encodedUsername}`,
       { profile: { ...profile, following: true } },
       false,
     );
-    UserAPI.follow(pid);
-    trigger(`${SERVER_BASE_URL}/profiles/${pid}`);
-  };
+    await UserAPI.follow(pid);
+    trigger(`${SERVER_BASE_URL}/profiles/${encodedUsername}`);
+  }
 
-  const handleUnfollow = async () => {
+  async function handleUnfollow() {
     mutate(
-      `${SERVER_BASE_URL}/profiles/${pid}`,
-      { profile: { ...profile, following: true } },
-      true,
+      `${SERVER_BASE_URL}/profiles/${encodedUsername}`,
+      { profile: { ...profile, following: false } },
+      false,
     );
-    UserAPI.unfollow(pid);
-    trigger(`${SERVER_BASE_URL}/profiles/${pid}`);
-  };
+    await UserAPI.unfollow(pid);
+    trigger(`${SERVER_BASE_URL}/profiles/${encodedUsername}`);
+  }
 
   return (
     <div className="profile-page">
@@ -96,7 +97,7 @@ const Profile = ({ initialProfile }) => {
       </div>
     </div>
   );
-};
+}
 
 Profile.getInitialProps = async ({ query: { pid } }) => {
   const { data: initialProfile } = await UserAPI.get(pid);
