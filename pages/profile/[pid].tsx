@@ -20,9 +20,10 @@ function Profile({ initialProfile }) {
   const {
     query: { pid },
   } = router;
+  const encodedUsername = encodeURIComponent(String(pid));
 
   const { data: fetchedProfile, error: profileError } = useSWR(
-    `${SERVER_BASE_URL}/profiles/${encodeURIComponent(String(pid))}`,
+    `${SERVER_BASE_URL}/profiles/${encodedUsername}`,
     fetcher,
     { initialData: initialProfile },
   );
@@ -38,22 +39,22 @@ function Profile({ initialProfile }) {
 
   async function handleFollow() {
     mutate(
-      `${SERVER_BASE_URL}/profiles/${pid}`,
+      `${SERVER_BASE_URL}/profiles/${encodedUsername}`,
       { profile: { ...profile, following: true } },
       false,
     );
     await UserAPI.follow(pid);
-    trigger(`${SERVER_BASE_URL}/profiles/${pid}`);
+    trigger(`${SERVER_BASE_URL}/profiles/${encodedUsername}`);
   }
 
   async function handleUnfollow() {
     mutate(
-      `${SERVER_BASE_URL}/profiles/${pid}`,
+      `${SERVER_BASE_URL}/profiles/${encodedUsername}`,
       { profile: { ...profile, following: false } },
       false,
     );
     await UserAPI.unfollow(pid);
-    trigger(`${SERVER_BASE_URL}/profiles/${pid}`);
+    trigger(`${SERVER_BASE_URL}/profiles/${encodedUsername}`);
   }
 
   return (
