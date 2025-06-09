@@ -6,7 +6,7 @@ import SettingsForm from '../../features/profile/SettingsForm';
 import checkLogin from '../../lib/utils/checkLogin';
 import storage from '../../lib/utils/storage';
 
-const Settings = ({ res }) => {
+function Settings({ res }) {
   const { data: currentUser } = useSWR('user', storage);
   const isLoggedIn = checkLogin(currentUser);
 
@@ -43,7 +43,7 @@ const Settings = ({ res }) => {
       </div>
     </div>
   );
-};
+}
 
 Settings.getInitialProps = async ({ res }) => {
   return {
