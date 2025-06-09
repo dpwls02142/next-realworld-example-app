@@ -15,7 +15,7 @@ export async function getServerSideProps({ query }) {
   return { props: { article } };
 }
 
-const EditArticlePage = ({ article }) => {
+function EditArticlePage({ article }) {
   const [errors, setErrors] = useState([]);
   const [isLoading, setLoading] = useState(false);
   const { data: currentUser } = useSWR('user', storage);
@@ -51,6 +51,6 @@ const EditArticlePage = ({ article }) => {
       </div>
     </div>
   );
-};
+}
 
 export default EditArticlePage;

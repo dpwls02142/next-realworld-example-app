@@ -15,7 +15,7 @@ import { SERVER_BASE_URL } from '../../lib/utils/constant';
 import fetcher from '../../lib/utils/fetcher';
 import storage from '../../lib/utils/storage';
 
-const Profile = ({ initialProfile }) => {
+function Profile({ initialProfile }) {
   const router = useRouter();
   const {
     query: { pid },
@@ -96,7 +96,7 @@ const Profile = ({ initialProfile }) => {
       </div>
     </div>
   );
-};
+}
 
 Profile.getInitialProps = async ({ query: { pid } }) => {
   const { data: initialProfile } = await UserAPI.get(pid);
