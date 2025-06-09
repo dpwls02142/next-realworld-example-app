@@ -1,5 +1,5 @@
 import Router from 'next/router';
-import React from 'react';
+import { MouseEvent } from 'react';
 import useSWR, { mutate, trigger } from 'swr';
 
 import SettingsForm from '../../features/profile/SettingsForm';
@@ -20,12 +20,13 @@ function Settings({ res }) {
     Router.push(`/`);
   }
 
-  const handleLogout = async (e) => {
+  async function handleLogout(e: MouseEvent) {
     e.preventDefault();
     window.localStorage.removeItem('user');
     mutate('user', null);
-    Router.push(`/`).then(() => trigger('user'));
-  };
+    await Router.push('/');
+    trigger('user');
+  }
 
   return (
     <div className="settings-page">
