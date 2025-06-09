@@ -36,25 +36,25 @@ function Profile({ initialProfile }) {
   const isLoggedIn = checkLogin(currentUser);
   const isUser = currentUser && username === currentUser?.username;
 
-  const handleFollow = async () => {
+  async function handleFollow() {
     mutate(
       `${SERVER_BASE_URL}/profiles/${pid}`,
       { profile: { ...profile, following: true } },
       false,
     );
-    UserAPI.follow(pid);
+    await UserAPI.follow(pid);
     trigger(`${SERVER_BASE_URL}/profiles/${pid}`);
-  };
+  }
 
-  const handleUnfollow = async () => {
+  async function handleUnfollow() {
     mutate(
       `${SERVER_BASE_URL}/profiles/${pid}`,
       { profile: { ...profile, following: false } },
       false,
     );
-    UserAPI.unfollow(pid);
+    await UserAPI.unfollow(pid);
     trigger(`${SERVER_BASE_URL}/profiles/${pid}`);
-  };
+  }
 
   return (
     <div className="profile-page">
