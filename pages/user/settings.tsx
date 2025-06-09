@@ -1,12 +1,12 @@
 import Router from 'next/router';
-import React from 'react';
+import { MouseEvent } from 'react';
 import useSWR, { mutate, trigger } from 'swr';
 
 import SettingsForm from '../../features/profile/SettingsForm';
 import checkLogin from '../../lib/utils/checkLogin';
 import storage from '../../lib/utils/storage';
 
-const Settings = ({ res }) => {
+function Settings({ res }) {
   const { data: currentUser } = useSWR('user', storage);
   const isLoggedIn = checkLogin(currentUser);
 
@@ -20,12 +20,13 @@ const Settings = ({ res }) => {
     Router.push(`/`);
   }
 
-  const handleLogout = async (e) => {
+  async function handleLogout(e: MouseEvent) {
     e.preventDefault();
     window.localStorage.removeItem('user');
     mutate('user', null);
-    Router.push(`/`).then(() => trigger('user'));
-  };
+    await Router.push('/');
+    trigger('user');
+  }
 
   return (
     <div className="settings-page">
@@ -43,7 +44,7 @@ const Settings = ({ res }) => {
       </div>
     </div>
   );
-};
+}
 
 Settings.getInitialProps = async ({ res }) => {
   return {
