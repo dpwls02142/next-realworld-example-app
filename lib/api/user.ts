@@ -2,12 +2,36 @@ import axios from 'axios';
 
 import { SERVER_BASE_URL } from '../utils/constant';
 
+type ApiResponse<T = any> = {
+  data: T;
+  status: number;
+};
+
+export type ApiError = {
+  message: string;
+  code: string;
+  status?: number;
+};
+
 const withToken = (token: string) => ({
   headers: {
     Authorization: `Token ${encodeURIComponent(token)}`,
     'Content-Type': 'application/json',
   },
 });
+
+const handleApiError = (error: any): never => {
+  if (error.response?.status === 409) {
+    const apiError: ApiError = {
+      message: '이미 팔로우한 사용자입니다.',
+      code: 'ALREADY_FOLLOWING',
+      status: 409,
+    };
+    throw apiError;
+  }
+
+  throw error;
+};
 
 const UserAPI = {
   current: async () => {
@@ -17,7 +41,7 @@ const UserAPI = {
       const response = await axios.get(`/user`, withToken(token));
       return response;
     } catch (error) {
-      return error.response;
+      handleApiError(error);
     }
   },
   login: async (email: string, password: string) => {
@@ -33,7 +57,7 @@ const UserAPI = {
       );
       return response;
     } catch (error) {
-      return error.response;
+      handleApiError(error);
     }
   },
   register: async (username: string, email: string, password: string) => {
@@ -49,7 +73,7 @@ const UserAPI = {
       );
       return response;
     } catch (error) {
-      return error.response;
+      handleApiError(error);
     }
   },
   save: async (user: any) => {
@@ -65,7 +89,7 @@ const UserAPI = {
       );
       return response;
     } catch (error) {
-      return error.response;
+      handleApiError(error);
     }
   },
   follow: async (username: string) => {
@@ -79,7 +103,7 @@ const UserAPI = {
       );
       return response;
     } catch (error) {
-      return error.response;
+      handleApiError(error);
     }
   },
   unfollow: async (username: string) => {
@@ -92,11 +116,19 @@ const UserAPI = {
       );
       return response;
     } catch (error) {
-      return error.response;
+      handleApiError(error);
     }
   },
-  get: async (username: string) =>
-    axios.get(`${SERVER_BASE_URL}/profiles/${username}`),
+  get: async (username: string) => {
+    try {
+      const response = await axios.get(
+        `${SERVER_BASE_URL}/profiles/${username}`,
+      );
+      return response;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
 };
 
 export default UserAPI;
