@@ -2,16 +2,19 @@ import axios from 'axios';
 
 import { SERVER_BASE_URL } from '../utils/constant';
 
+const withToken = (token: string) => ({
+  headers: {
+    Authorization: `Token ${encodeURIComponent(token)}`,
+    'Content-Type': 'application/json',
+  },
+});
+
 const UserAPI = {
   current: async () => {
     const user: any = window.localStorage.getItem('user');
     const token = user?.token;
     try {
-      const response = await axios.get(`/user`, {
-        headers: {
-          Authorization: `Token ${encodeURIComponent(token)}`,
-        },
-      });
+      const response = await axios.get(`/user`, withToken(token));
       return response;
     } catch (error) {
       return error.response;
@@ -72,11 +75,7 @@ const UserAPI = {
       const response = await axios.post(
         `${SERVER_BASE_URL}/profiles/${username}/follow`,
         {},
-        {
-          headers: {
-            Authorization: `Token ${encodeURIComponent(token)}`,
-          },
-        },
+        withToken(token),
       );
       return response;
     } catch (error) {
@@ -89,11 +88,7 @@ const UserAPI = {
     try {
       const response = await axios.delete(
         `${SERVER_BASE_URL}/profiles/${username}/follow`,
-        {
-          headers: {
-            Authorization: `Token ${encodeURIComponent(token)}`,
-          },
-        },
+        withToken(token),
       );
       return response;
     } catch (error) {
