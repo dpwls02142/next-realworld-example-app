@@ -21,12 +21,12 @@ function EditArticlePage({ article }) {
   const { data: currentUser } = useSWR('user', storage);
   const { query } = useRouter();
 
-  const handleSubmit = async (data: ArticleInput) => {
+  const handleSubmit = async (editData: ArticleInput) => {
     setLoading(true);
 
     try {
       const response = await ArticleAPI.update(
-        { ...article, ...data, slug: query.slug as string },
+        { ...article, ...editData, slug: query.slug as string },
         currentUser?.token,
       );
 

@@ -11,11 +11,11 @@ function NewArticlePage() {
   const [isLoading, setLoading] = useState(false);
   const { data: currentUser } = useSWR('user', storage);
 
-  const handleSubmit = async (data: ArticleInput) => {
+  const handleSubmit = async (newData: ArticleInput) => {
     setLoading(true);
 
     try {
-      const response = await ArticleAPI.create(data, currentUser.token);
+      const response = await ArticleAPI.create(newData, currentUser.token);
 
       if (response.status === 200 || response.status === 201) {
         Router.push('/');
