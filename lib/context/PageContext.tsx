@@ -1,18 +1,16 @@
-import React from 'react';
+import { Dispatch, ReactNode, createContext, useContext } from 'react';
 
 import useSessionStorage from '../hooks/useSessionStorage';
 
-export type PageDispatch = React.Dispatch<any>;
+export type PageDispatch = Dispatch<any>;
 
 interface Props {
-  children: React.ReactNode;
+  children: ReactNode;  
 }
 
-const PageStateContext = React.createContext<number | undefined>(undefined);
+const PageStateContext = createContext<number | undefined>(undefined);
 
-const PageDispatchContext = React.createContext<PageDispatch | undefined>(
-  undefined,
-);
+const PageDispatchContext = createContext<PageDispatch | undefined>(undefined);
 
 const PageContextProvider = ({ children }: Props) => {
   const [page, setPage] = useSessionStorage('offset', 0);
@@ -26,12 +24,12 @@ const PageContextProvider = ({ children }: Props) => {
 };
 
 export const usePageState = () => {
-  const state = React.useContext(PageStateContext);
+  const state = useContext(PageStateContext);
   return state;
 };
 
 export const usePageDispatch = () => {
-  const dispatch = React.useContext(PageDispatchContext);
+  const dispatch = useContext(PageDispatchContext);
   return dispatch;
 };
 
