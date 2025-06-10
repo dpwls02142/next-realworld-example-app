@@ -21,7 +21,7 @@ function NewArticlePage() {
 
     setLoading(false);
 
-    if (status !== 200) return setErrors(res.errors);
+    if (status !== 200 && status !== 201) return setErrors(res.errors);
 
     Router.push('/');
   };
