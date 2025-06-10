@@ -14,16 +14,22 @@ function NewArticlePage() {
   const handleSubmit = async (data: ArticleInput) => {
     setLoading(true);
 
-    const { data: res, status } = await ArticleAPI.create(
-      data,
-      currentUser?.token,
-    );
+    try {
+      const response = await ArticleAPI.create(data, currentUser.token);
 
-    setLoading(false);
-
-    if (status !== 200 && status !== 201) return setErrors(res.errors);
-
-    Router.push('/');
+      if (response.status === 200 || response.status === 201) {
+        Router.push('/');
+        return;
+      }
+    } catch (error) {
+      if (error.code === 'DUPLICATE_ARTICLE') {
+        setErrors([error.message]);
+      } else {
+        setErrors(['아티클 생성에 실패했습니다.']);
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
