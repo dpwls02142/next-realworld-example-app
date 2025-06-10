@@ -1,41 +1,23 @@
-export interface ArticleList {
-  articles: ArticleType[];
-}
+import { Author } from './authorType';
 
-export interface Article {
+export type ArticleType = {
+  description: string;
+  body: string;
+  createdAt: string;
+  updatedAt: string;
+  favorited: boolean;
+  favoritesCount: number;
+  author: Author;
+  tagList: string[];
+  slug: string;
+  title: string;
+};
+
+export interface ArticleResponse {
   article: ArticleType;
 }
 
-export interface ArticleBannerProps {
-  title: string;
-  article: Article;
+export interface ArticleListResponse {
+  articles: ArticleType[];
+  articlesCount: number;
 }
-
-export interface ArticleBodyProps {
-  htmlContent: { __html: string };
-  tags: string[];
-}
-
-export interface ArticlePageProps {
-  initialArticle: { article: Article };
-}
-
-export type ArticleType = {
-  tagList: string[];
-  createdAt: number;
-  author: Author;
-  description: string;
-  title: string;
-  body: string;
-  slug: string;
-  updatedAt: number;
-  favoritesCount: number;
-  favorited: boolean;
-};
-
-export type Author = {
-  username: string;
-  bio: string;
-  image: string;
-  following: boolean;
-};

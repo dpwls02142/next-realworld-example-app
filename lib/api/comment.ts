@@ -3,7 +3,7 @@ import axios from 'axios';
 import { SERVER_BASE_URL } from '../utils/constant';
 
 const CommentAPI = {
-  create: async (slug, comment) => {
+  create: async (slug: string, comment: string) => {
     try {
       const response = await axios.post(
         `${SERVER_BASE_URL}/articles/${slug}/comments`,
@@ -14,7 +14,7 @@ const CommentAPI = {
       return error.response;
     }
   },
-  delete: async (slug, commentId) => {
+  delete: async (slug: string, commentId: string) => {
     try {
       const response = await axios.delete(
         `${SERVER_BASE_URL}/articles/${slug}/comments/${commentId}`,
@@ -25,7 +25,7 @@ const CommentAPI = {
     }
   },
 
-  forArticle: (slug) =>
+  forArticle: (slug: string) =>
     axios.get(`${SERVER_BASE_URL}/articles/${slug}/comments`),
 };
 

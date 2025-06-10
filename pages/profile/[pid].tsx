@@ -43,7 +43,7 @@ function Profile({ initialProfile }) {
       { profile: { ...profile, following: true } },
       false,
     );
-    await UserAPI.follow(pid);
+    await UserAPI.follow(pid as string);
     trigger(`${SERVER_BASE_URL}/profiles/${encodedUsername}`);
   }
 
@@ -53,7 +53,7 @@ function Profile({ initialProfile }) {
       { profile: { ...profile, following: false } },
       false,
     );
-    await UserAPI.unfollow(pid);
+    await UserAPI.unfollow(pid as string);
     trigger(`${SERVER_BASE_URL}/profiles/${encodedUsername}`);
   }
 

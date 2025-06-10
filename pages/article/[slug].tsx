@@ -6,32 +6,32 @@ import useSWR from 'swr';
 import ArticleMeta from '../../features/article/ArticleMeta';
 import CommentList from '../../features/comment/CommentList';
 import ArticleAPI from '../../lib/api/article';
-import {
-  ArticleBannerProps,
-  ArticleBodyProps,
-  ArticlePageProps,
-} from '../../lib/types/articleType';
+import { ArticleType, ArticleResponse } from '../../lib/types/articleType';
 import { SERVER_BASE_URL } from '../../lib/utils/constant';
 import fetcher from '../../lib/utils/fetcher';
 
-function ArticleBanner({ title, article }: ArticleBannerProps) {
+function ArticleBanner({ article }: { article: ArticleType }) {
   return (
     <div className="banner">
       <div className="container">
-        <h1>{title}</h1>
+        <h1>{article.title}</h1>
         <ArticleMeta article={article} />
       </div>
     </div>
   );
 }
 
-function ArticleBody({ htmlContent, tags }: ArticleBodyProps) {
+function ArticleBody({ article }: { article: ArticleType }) {
+  const htmlContent = {
+    __html: marked(article.body, { sanitize: true }),
+  };
+
   return (
     <div className="row article-content">
       <div className="col-xs-12">
         <div dangerouslySetInnerHTML={htmlContent} />
         <ul className="tag-list">
-          {tags.map((tag) => (
+          {article.tagList.map((tag) => (
             <li key={tag} className="tag-default tag-pill tag-outline">
               {tag}
             </li>
@@ -52,7 +52,7 @@ function CommentsSection() {
   );
 }
 
-function ArticlePage({ initialArticle }: ArticlePageProps) {
+function ArticlePage({ initialArticle }: { initialArticle: ArticleResponse }) {
   const router = useRouter();
   const {
     query: { slug },
@@ -66,18 +66,13 @@ function ArticlePage({ initialArticle }: ArticlePageProps) {
 
   const articleData = fetchedArticle || initialArticle;
   if (!articleData) return <div>데이터 없음</div>;
-  const { article } = articleData;
-
-  const htmlContent = {
-    __html: marked(article.body, { sanitize: true }),
-  };
 
   return (
     <div className="article-page">
-      <ArticleBanner title={article.title} article={article} />
+      <ArticleBanner article={articleData.article} />
 
       <div className="container page">
-        <ArticleBody htmlContent={htmlContent} tags={article.tagList} />
+        <ArticleBody article={articleData.article} />
 
         <hr />
         <div className="article-actions" />

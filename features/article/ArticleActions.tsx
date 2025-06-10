@@ -14,7 +14,7 @@ const ArticleActions = ({ article }) => {
   const isLoggedIn = checkLogin(currentUser);
   const router = useRouter();
   const {
-    query: { pid },
+    query: { slug },
   } = router;
 
   const handleDelete = async () => {
@@ -24,8 +24,8 @@ const ArticleActions = ({ article }) => {
 
     if (!result) return;
 
-    await ArticleAPI.delete(pid, currentUser?.token);
-    trigger(`${SERVER_BASE_URL}/articles/${pid}`);
+    await ArticleAPI.delete(slug as string, currentUser?.token);
+    trigger(`${SERVER_BASE_URL}/articles/${slug}`);
     Router.push(`/`);
   };
 
@@ -36,8 +36,8 @@ const ArticleActions = ({ article }) => {
     <Maybe test={canModify}>
       <span>
         <CustomLink
-          href="/editor/[pid]"
-          as={`/editor/${article.slug}`}
+          href="/editor/[slug]"
+          as={`/editor/${slug}`}
           className="btn btn-outline-secondary btn-sm"
         >
           <i className="ion-edit" /> Edit Article

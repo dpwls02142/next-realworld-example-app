@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import React from 'react';
+import { useEffect } from 'react';
 import useSWR from 'swr';
 
 import ArticlePreview from './ArticlePreview';
@@ -59,6 +59,12 @@ const ArticleList = () => {
 
   const { data, error } = useSWR(fetchURL, fetcher);
 
+  useEffect(() => {
+    if (data?.articlesCount) {
+      setPageCount(data.articlesCount);
+    }
+  }, [data?.articlesCount, setPageCount]);
+
   if (error) {
     return (
       <div className="col-md-9">
@@ -73,7 +79,6 @@ const ArticleList = () => {
   if (!data) return <LoadingSpinner />;
 
   const { articles, articlesCount } = data;
-  setPageCount(articlesCount);
 
   if (articles && articles.length === 0) {
     return <div className="article-preview">No articles are here... yet.</div>;
@@ -87,7 +92,7 @@ const ArticleList = () => {
 
       <Maybe test={articlesCount && articlesCount > 20}>
         <Pagination
-          total={pageCount}
+          total={articlesCount}
           limit={20}
           pageCount={vw >= 768 ? 10 : 5}
           currentPage={page}
