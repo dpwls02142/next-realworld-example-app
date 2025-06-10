@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 import { SERVER_BASE_URL } from '../utils/constant';
+import { Author } from '../types/authorType';
 
 const UserAPI = {
   current: async () => {
@@ -17,7 +18,7 @@ const UserAPI = {
       return error.response;
     }
   },
-  login: async (email, password) => {
+  login: async (email: string, password: string) => {
     try {
       const response = await axios.post(
         `${SERVER_BASE_URL}/users/login`,
@@ -33,7 +34,7 @@ const UserAPI = {
       return error.response;
     }
   },
-  register: async (username, email, password) => {
+  register: async (username: string, email: string, password: string) => {
     try {
       const response = await axios.post(
         `${SERVER_BASE_URL}/users`,
@@ -49,7 +50,7 @@ const UserAPI = {
       return error.response;
     }
   },
-  save: async (user) => {
+  save: async (user: Author) => {
     try {
       const response = await axios.put(
         `${SERVER_BASE_URL}/user`,
@@ -65,7 +66,7 @@ const UserAPI = {
       return error.response;
     }
   },
-  follow: async (username) => {
+  follow: async (username: string) => {
     const user: any = JSON.parse(window.localStorage.getItem('user'));
     const token = user?.token;
     try {
@@ -83,7 +84,7 @@ const UserAPI = {
       return error.response;
     }
   },
-  unfollow: async (username) => {
+  unfollow: async (username: string) => {
     const user: any = JSON.parse(window.localStorage.getItem('user'));
     const token = user?.token;
     try {
@@ -100,7 +101,8 @@ const UserAPI = {
       return error.response;
     }
   },
-  get: async (username) => axios.get(`${SERVER_BASE_URL}/profiles/${username}`),
+  get: async (username: string) =>
+    axios.get(`${SERVER_BASE_URL}/profiles/${username}`),
 };
 
 export default UserAPI;
