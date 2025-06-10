@@ -55,21 +55,12 @@ const ArticleAPI = {
   },
 
   create: async (articleData, token) => {
-    try {
       const { data, status } = await axios.post(
         article,
         JSON.stringify({ article: articleData }),
         withToken(token),
       );
       return { data, status };
-    } catch (error) {
-      if (error.response) {
-        console.log('400 에러:', error.response.data);
-      } else {
-        console.log('기타 에러:', error.message);
-      }
-      throw error;
-    }
   },
 };
 
