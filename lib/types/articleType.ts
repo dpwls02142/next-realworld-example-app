@@ -1,3 +1,5 @@
+import { Author } from './authorType';
+
 export type ArticleType = {
   description: string;
   body: string;
@@ -9,13 +11,6 @@ export type ArticleType = {
   tagList: string[];
   slug: string;
   title: string;
-};
-
-export type Author = {
-  following: boolean;
-  bio: string | null;
-  image: string;
-  username: string;
 };
 
 export interface ArticleResponse {
