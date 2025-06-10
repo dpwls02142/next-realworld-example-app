@@ -5,10 +5,9 @@ export interface Comments {
 }
 
 export type CommentType = {
-  createdAt: number;
   id: string;
-  body: string;
-  slug: string;
   author: Author;
+  body: string;
+  createdAt: number;
   updatedAt: number;
 };
