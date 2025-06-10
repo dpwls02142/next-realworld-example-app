@@ -155,13 +155,12 @@ const ArticleAPI = {
     token: string,
   ): Promise<ApiResponse<ArticleResponse>> => {
     if (createRequestThrottler.shouldThrottle()) {
-      console.warn(
-        '너무 빠른 연속 요청이 감지되었습니다. 이전 요청을 기다립니다.',
-      );
-      const lastRequest = createRequestThrottler.getLastRequest();
-      if (lastRequest) {
-        return lastRequest;
-      }
+      const throttleError: ApiError = {
+        message: '요청이 너무 빠릅니다. 잠시 후 다시 시도해주세요.',
+        code: 'TOO_MANY_REQUESTS',
+        status: 429,
+      };
+      throw throttleError;
     }
 
     const request = (async (): Promise<ApiResponse<ArticleResponse>> => {
