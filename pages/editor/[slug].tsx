@@ -25,7 +25,7 @@ function EditArticlePage({ article }) {
     setLoading(true);
 
     const { data: res, status } = await ArticleAPI.update(
-      { ...data, slug: query.slug },
+      { ...article, ...data, slug: query.slug as string },
       currentUser?.token,
     );
 
