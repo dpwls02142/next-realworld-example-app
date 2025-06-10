@@ -2,11 +2,6 @@ import axios from 'axios';
 
 import { SERVER_BASE_URL } from '../utils/constant';
 
-type ApiResponse<T = any> = {
-  data: T;
-  status: number;
-};
-
 export type ApiError = {
   message: string;
   code: string;
