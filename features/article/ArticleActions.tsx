@@ -31,11 +31,11 @@ const ArticleActions = ({ article }) => {
     Router.push(`/`);
   };
 
-  const canModify =
-    isLoggedIn && currentUser?.username === article?.author?.username;
+  const isArticleOwner = currentUser?.username === article?.author?.username;
+  const canManage = isLoggedIn && isArticleOwner;
 
   return (
-    <Maybe test={canModify}>
+    <Maybe test={canManage}>
       <span>
         <CustomLink
           href="/editor/[slug]"
