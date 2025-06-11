@@ -54,7 +54,7 @@ const ArticlePreview = ({ article }: ArticleProps) => {
     } catch {
       setPreview({
         ...preview,
-        favorited: preview.favorited,
+        favorited: !nextFavorited,
         favoritesCount: preview.favoritesCount,
       });
     }
