@@ -9,6 +9,8 @@ import { SERVER_BASE_URL } from '../../lib/utils/constant';
 import storage from '../../lib/utils/storage';
 import Maybe from '../../shared/components/Maybe';
 
+const CONFIRM_DELETE_MESSAGE = `Do you really want to delete it?`;
+
 const ArticleActions = ({ article }) => {
   const { data: currentUser } = useSWR('user', storage);
   const isLoggedIn = checkLogin(currentUser);
@@ -20,7 +22,7 @@ const ArticleActions = ({ article }) => {
   const handleDelete = async () => {
     if (!isLoggedIn) return;
 
-    const result = window.confirm('Do you really want to delete it?');
+    const result = window.confirm(CONFIRM_DELETE_MESSAGE);
 
     if (!result) return;
 
@@ -29,11 +31,11 @@ const ArticleActions = ({ article }) => {
     Router.push(`/`);
   };
 
-  const canModify =
-    isLoggedIn && currentUser?.username === article?.author?.username;
+  const isArticleOwner = currentUser?.username === article?.author?.username;
+  const canManage = isLoggedIn && isArticleOwner;
 
   return (
-    <Maybe test={canModify}>
+    <Maybe test={canManage}>
       <span>
         <CustomLink
           href="/editor/[slug]"

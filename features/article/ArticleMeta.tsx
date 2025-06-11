@@ -3,9 +3,16 @@ import React from 'react';
 import ArticleActions from '../../features/article/ArticleActions';
 import CustomImage from '../../shared/components/CustomImage';
 import CustomLink from '../../shared/components/CustomLink';
+import { ArticleType } from 'lib/types/articleType';
 
-const ArticleMeta = ({ article }) => {
-  if (!article) return;
+const ArticleMeta = ({
+  article,
+  showActions = true,
+}: {
+  article: ArticleType;
+  showActions?: boolean;
+}) => {
+  if (!article) return null;
 
   return (
     <div className="article-meta">
@@ -29,7 +36,8 @@ const ArticleMeta = ({ article }) => {
         </span>
       </div>
 
-      <ArticleActions article={article} />
+      {/* 수정/삭제 버튼은 showActions가 true일 때만 보이도록 */}
+      {showActions && <ArticleActions article={article} />}
     </div>
   );
 };

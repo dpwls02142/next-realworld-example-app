@@ -5,20 +5,19 @@ import { usePageDispatch } from '../../lib/context/PageContext';
 
 const ProfileTab = ({ profile }) => {
   const setPage = usePageDispatch();
+  const encodedUsername = encodeURIComponent(profile.username);
+
   return (
     <ul className="nav nav-pills outline-active">
       <li className="nav-item">
-        <NavLink
-          href="/profile/[pid]"
-          as={`/profile/${encodeURIComponent(profile.username)}`}
-        >
+        <NavLink href="/profile/[pid]" as={`/profile/${encodedUsername}`}>
           <span onClick={() => setPage(0)}>My Articles</span>
         </NavLink>
       </li>
       <li className="nav-item">
         <NavLink
           href="/profile/[pid]?favorite=true"
-          as={`/profile/${encodeURIComponent(profile.username)}?favorite=true`}
+          as={`/profile/${encodedUsername}?favorite=true`}
         >
           <span onClick={() => setPage(0)}>Favorited Articles</span>
         </NavLink>

@@ -1,106 +1,84 @@
 import axios from 'axios';
 import Link from 'next/link';
 import Router from 'next/router';
-import React from 'react';
+import { useState } from 'react';
 import useSWR from 'swr';
 
 import CustomLink from '../../shared/components/CustomLink';
-import CustomImage from '../../shared/components/CustomImage';
+import ArticleMeta from '../../features/article/ArticleMeta';
 import { usePageDispatch } from '../../lib/context/PageContext';
 import checkLogin from '../../lib/utils/checkLogin';
 import { SERVER_BASE_URL } from '../../lib/utils/constant';
 import storage from '../../lib/utils/storage';
+import { ArticleType } from '../../lib/types/articleType';
 
-const FAVORITED_CLASS = 'btn btn-sm btn-primary';
-const NOT_FAVORITED_CLASS = 'btn btn-sm btn-outline-primary';
+type ArticleProps = {
+  article: ArticleType;
+};
 
-const ArticlePreview = ({ article }) => {
+const ArticlePreview = ({ article }: ArticleProps) => {
   const setPage = usePageDispatch();
-
-  const [preview, setPreview] = React.useState(article);
-  const [hover, setHover] = React.useState(false);
-  const [currentIndex, setCurrentIndex] = React.useState(-1);
+  const [preview, setPreview] = useState(article);
+  const [hover, setHover] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(-1);
 
   const { data: currentUser } = useSWR('user', storage);
   const isLoggedIn = checkLogin(currentUser);
 
-  const handleClickFavorite = async (slug) => {
+  const toggleFavorite = async () => {
     if (!isLoggedIn) {
-      Router.push(`/user/login`);
+      Router.push('/user/login');
       return;
     }
 
+    const nextFavorited = !preview.favorited;
+    const nextFavoritesCount = nextFavorited
+      ? preview.favoritesCount + 1
+      : preview.favoritesCount - 1;
+
     setPreview({
       ...preview,
-      favorited: !preview.favorited,
-      favoritesCount: preview.favorited
-        ? preview.favoritesCount - 1
-        : preview.favoritesCount + 1,
+      favorited: nextFavorited,
+      favoritesCount: nextFavoritesCount,
     });
 
+    const config = {
+      headers: { Authorization: `Token ${currentUser?.token}` },
+    };
+
     try {
-      if (preview.favorited) {
-        await axios.delete(`${SERVER_BASE_URL}/articles/${slug}/favorite`, {
-          headers: {
-            Authorization: `Token ${currentUser?.token}`,
-          },
-        });
-      } else {
-        await axios.post(
-          `${SERVER_BASE_URL}/articles/${slug}/favorite`,
-          {},
-          {
-            headers: {
-              Authorization: `Token ${currentUser?.token}`,
-            },
-          },
-        );
-      }
-    } catch (error) {
+      const url = `${SERVER_BASE_URL}/articles/${preview.slug}/favorite`;
+      nextFavorited
+        ? await axios.post(url, {}, config)
+        : await axios.delete(url, config);
+    } catch {
       setPreview({
         ...preview,
-        favorited: !preview.favorited,
-        favoritesCount: preview.favorited
-          ? preview.favoritesCount - 1
-          : preview.favoritesCount + 1,
+        favorited: !nextFavorited,
+        favoritesCount: preview.favoritesCount,
       });
     }
   };
 
-  if (!article) return;
-
   return (
     <div className="article-preview" style={{ padding: '1.5rem 0.5rem' }}>
-      <div className="article-meta">
-        <CustomLink
-          href="/profile/[pid]"
-          as={`/profile/${preview.author.username}`}
-        >
-          <CustomImage
-            src={preview.author.image}
-            alt="author's profile image"
-          />
-        </CustomLink>
-
-        <div className="info">
-          <CustomLink
-            href="/profile/[pid]"
-            as={`/profile/${preview.author.username}`}
-            className="author"
-          >
-            <span onClick={() => setPage(0)}>{preview.author.username}</span>
-          </CustomLink>
-          <span className="date">
-            {new Date(preview.createdAt).toDateString()}
-          </span>
-        </div>
-
+      <div
+        className="article-meta-wrapper"
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        <ArticleMeta article={preview} showActions={false} />
         <div className="pull-xs-right">
           <button
             className={
-              preview.favorited ? FAVORITED_CLASS : NOT_FAVORITED_CLASS
+              preview.favorited
+                ? 'btn btn-sm btn-primary'
+                : 'btn btn-sm btn-outline-primary'
             }
-            onClick={() => handleClickFavorite(preview.slug)}
+            onClick={toggleFavorite}
           >
             <i className="ion-heart" /> {preview.favoritesCount}
           </button>
@@ -116,38 +94,41 @@ const ArticlePreview = ({ article }) => {
         <p>{preview.description}</p>
         <span>Read more...</span>
         <ul className="tag-list" style={{ maxWidth: '100%' }}>
-          {preview.tagList.map((tag, index) => {
-            return (
-              <Link href={`/?tag=${tag}`} as={`/?tag=${tag}`} key={index}>
-                <li
-                  className="tag-default tag-pill tag-outline"
-                  onClick={(e) => e.stopPropagation()}
-                  onMouseOver={() => {
-                    setHover(true);
-                    setCurrentIndex(index);
-                  }}
-                  onMouseLeave={() => {
-                    setHover(false);
-                    setCurrentIndex(-1);
-                  }}
+          {preview.tagList.map((tag, index) => (
+            <Link
+              href={`/?tag=${tag}`}
+              as={`/?tag=${tag}`}
+              key={index}
+              passHref
+            >
+              <li
+                className="tag-default tag-pill tag-outline"
+                onClick={(e) => e.stopPropagation()}
+                onMouseOver={() => {
+                  setHover(true);
+                  setCurrentIndex(index);
+                }}
+                onMouseLeave={() => {
+                  setHover(false);
+                  setCurrentIndex(-1);
+                }}
+                style={{
+                  borderColor:
+                    hover && currentIndex === index ? '#5cb85c' : 'initial',
+                }}
+              >
+                <span
                   style={{
-                    borderColor:
-                      hover && currentIndex === index ? '#5cb85c' : 'initial',
+                    color:
+                      hover && currentIndex === index ? '#5cb85c' : 'inherit',
                   }}
+                  onClick={() => setPage(0)}
                 >
-                  <span
-                    style={{
-                      color:
-                        hover && currentIndex === index ? '#5cb85c' : 'inherit',
-                    }}
-                    onClick={() => setPage(0)}
-                  >
-                    {tag}
-                  </span>
-                </li>
-              </Link>
-            );
-          })}
+                  {tag}
+                </span>
+              </li>
+            </Link>
+          ))}
         </ul>
       </CustomLink>
     </div>
