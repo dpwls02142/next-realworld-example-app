@@ -1,7 +1,7 @@
-import React from 'react';
+import { useState } from 'react';
 
 const TagInput = ({ tagList, addTag, removeTag }) => {
-  const [tag, setTag] = React.useState('');
+  const [tag, setTag] = useState('');
 
   const changeTagInput = (e) => setTag(e.target.value);
 
