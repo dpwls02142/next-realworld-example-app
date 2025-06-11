@@ -5,7 +5,7 @@ import { useState } from 'react';
 import useSWR from 'swr';
 
 import CustomLink from '../../shared/components/CustomLink';
-import CustomImage from '../../shared/components/CustomImage';
+import ArticleMeta from '../../features/article/ArticleMeta';
 import { usePageDispatch } from '../../lib/context/PageContext';
 import checkLogin from '../../lib/utils/checkLogin';
 import { SERVER_BASE_URL } from '../../lib/utils/constant';
@@ -51,8 +51,7 @@ const ArticlePreview = ({ article }: ArticleProps) => {
       nextFavorited
         ? await axios.post(url, {}, config)
         : await axios.delete(url, config);
-    } 
-    catch {
+    } catch {
       setPreview({
         ...preview,
         favorited: preview.favorited,
@@ -63,30 +62,15 @@ const ArticlePreview = ({ article }: ArticleProps) => {
 
   return (
     <div className="article-preview" style={{ padding: '1.5rem 0.5rem' }}>
-      <div className="article-meta">
-        <CustomLink
-          href="/profile/[pid]"
-          as={`/profile/${preview.author.username}`}
-        >
-          <CustomImage
-            src={preview.author.image}
-            alt="author's profile image"
-          />
-        </CustomLink>
-
-        <div className="info">
-          <CustomLink
-            href="/profile/[pid]"
-            as={`/profile/${preview.author.username}`}
-            className="author"
-          >
-            <span onClick={() => setPage(0)}>{preview.author.username}</span>
-          </CustomLink>
-          <span className="date">
-            {new Date(preview.createdAt).toDateString()}
-          </span>
-        </div>
-
+      <div
+        className="article-meta-wrapper"
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        <ArticleMeta article={preview} showActions={false} />
         <div className="pull-xs-right">
           <button
             className={
@@ -110,38 +94,41 @@ const ArticlePreview = ({ article }: ArticleProps) => {
         <p>{preview.description}</p>
         <span>Read more...</span>
         <ul className="tag-list" style={{ maxWidth: '100%' }}>
-          {preview.tagList.map((tag, index) => {
-            return (
-              <Link href={`/?tag=${tag}`} as={`/?tag=${tag}`} key={index}>
-                <li
-                  className="tag-default tag-pill tag-outline"
-                  onClick={(e) => e.stopPropagation()}
-                  onMouseOver={() => {
-                    setHover(true);
-                    setCurrentIndex(index);
-                  }}
-                  onMouseLeave={() => {
-                    setHover(false);
-                    setCurrentIndex(-1);
-                  }}
+          {preview.tagList.map((tag, index) => (
+            <Link
+              href={`/?tag=${tag}`}
+              as={`/?tag=${tag}`}
+              key={index}
+              passHref
+            >
+              <li
+                className="tag-default tag-pill tag-outline"
+                onClick={(e) => e.stopPropagation()}
+                onMouseOver={() => {
+                  setHover(true);
+                  setCurrentIndex(index);
+                }}
+                onMouseLeave={() => {
+                  setHover(false);
+                  setCurrentIndex(-1);
+                }}
+                style={{
+                  borderColor:
+                    hover && currentIndex === index ? '#5cb85c' : 'initial',
+                }}
+              >
+                <span
                   style={{
-                    borderColor:
-                      hover && currentIndex === index ? '#5cb85c' : 'initial',
+                    color:
+                      hover && currentIndex === index ? '#5cb85c' : 'inherit',
                   }}
+                  onClick={() => setPage(0)}
                 >
-                  <span
-                    style={{
-                      color:
-                        hover && currentIndex === index ? '#5cb85c' : 'inherit',
-                    }}
-                    onClick={() => setPage(0)}
-                  >
-                    {tag}
-                  </span>
-                </li>
-              </Link>
-            );
-          })}
+                  {tag}
+                </span>
+              </li>
+            </Link>
+          ))}
         </ul>
       </CustomLink>
     </div>
