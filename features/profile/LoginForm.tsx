@@ -1,31 +1,36 @@
 import Router from 'next/router';
-import React from 'react';
+import React, { useState } from 'react';
 import { mutate } from 'swr';
 
 import ListErrors from '../../shared/components/ListErrors';
 import UserAPI from '../../lib/api/user';
 
-const LoginForm = () => {
-  const [isLoading, setLoading] = React.useState(false);
-  const [errors, setErrors] = React.useState([]);
-  const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
+interface FormData {
+  email: string;
+  password: string;
+}
 
-  const handleEmailChange = React.useCallback(
-    (e) => setEmail(e.target.value),
-    [],
-  );
-  const handlePasswordChange = React.useCallback(
-    (e) => setPassword(e.target.value),
-    [],
-  );
+const LoginForm = () => {
+  const [isLoading, setLoading] = useState(false);
+  const [errors, setErrors] = useState([]);
+  const [formData, setFormData] = useState<FormData>({
+    email: '',
+    password: '',
+  });
+
+  const handleInputChange = (field: keyof FormData, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const { data, status } = await UserAPI.login(email, password);
+      const { data, status } = await UserAPI.login(
+        formData.email,
+        formData.password,
+      );
       if (status !== 200) {
         setErrors(data.errors);
       }
@@ -53,8 +58,8 @@ const LoginForm = () => {
               className="form-control form-control-lg"
               type="email"
               placeholder="Email"
-              value={email}
-              onChange={handleEmailChange}
+              value={formData.email}
+              onChange={(e) => handleInputChange('email', e.target.value)}
             />
           </fieldset>
 
@@ -63,8 +68,8 @@ const LoginForm = () => {
               className="form-control form-control-lg"
               type="password"
               placeholder="Password"
-              value={password}
-              onChange={handlePasswordChange}
+              value={formData.password}
+              onChange={(e) => handleInputChange('password', e.target.value)}
             />
           </fieldset>
 
