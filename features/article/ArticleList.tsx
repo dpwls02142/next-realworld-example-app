@@ -87,10 +87,7 @@ const ArticleList = () => {
     }
   }, [data?.articlesCount, setPageCount]);
 
-  const shouldShowPagination =
-    data?.articlesCount && data?.articlesCount > PAGINATION_THRESHOLD;
-  const paginationPageCount =
-    vw >= DESKTOP_BREAKPOINT ? DESKTOP_PAGE_COUNT : MOBILE_PAGE_COUNT;
+  const { articles = [], articlesCount = 0 } = data || {};
 
   if (error) {
     return (
@@ -105,11 +102,14 @@ const ArticleList = () => {
 
   if (!data) return <LoadingSpinner />;
 
-  const { articles, articlesCount } = data;
-
-  if (articles && articles.length === 0) {
+  if (articles.length === 0) {
     return <div className="article-preview">{ERROR_MESSAGES.NO_ARTICLES}</div>;
   }
+  
+  const shouldShowPagination =
+    articlesCount && articlesCount > PAGINATION_THRESHOLD;
+  const paginationPageCount =
+    vw >= DESKTOP_BREAKPOINT ? DESKTOP_PAGE_COUNT : MOBILE_PAGE_COUNT;
 
   return (
     <>
