@@ -5,10 +5,10 @@ import { mutate } from 'swr';
 import ListErrors from '../../shared/components/ListErrors';
 import UserAPI from '../../lib/api/user';
 
-interface FormData {
+type FormData = {
   email: string;
   password: string;
-}
+};
 
 const LoginForm = () => {
   const [isLoading, setLoading] = useState(false);
