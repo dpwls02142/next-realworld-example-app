@@ -1,17 +1,28 @@
-import axios from 'axios';
-import Router from 'next/router';
-import React from 'react';
+import { useRouter } from 'next/router';
+import { useState, useEffect } from 'react';
 import useSWR, { mutate } from 'swr';
-
+import axios from 'axios';
 import ListErrors from '../../shared/components/ListErrors';
 import checkLogin from '../../lib/utils/checkLogin';
 import { SERVER_BASE_URL } from '../../lib/utils/constant';
 import storage from '../../lib/utils/storage';
 
+type UserSettingsData = {
+  image: string;
+  username: string;
+  bio: string;
+  email: string;
+  password: string;
+};
+
 const SettingsForm = () => {
-  const [isLoading, setLoading] = React.useState(false);
-  const [errors, setErrors] = React.useState([]);
-  const [userInfo, setUserInfo] = React.useState({
+  const router = useRouter();
+  const { data: currentUser } = useSWR('user', storage);
+  const isLoggedIn = checkLogin(currentUser);
+
+  const [isLoading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<string[]>([]);
+  const [userInfo, setUserInfo] = useState<UserSettingsData>({
     image: '',
     username: '',
     bio: '',
@@ -19,66 +30,65 @@ const SettingsForm = () => {
     password: '',
   });
 
-  const { data: currentUser } = useSWR('user', storage);
-  const isLoggedIn = checkLogin(currentUser);
+  useEffect(() => {
+    if (isLoggedIn && currentUser) {
+      setUserInfo((prev) => ({ ...prev, ...currentUser, password: '' }));
+    }
+  }, [isLoggedIn, currentUser]);
 
-  React.useEffect(() => {
-    if (!isLoggedIn) return;
-    setUserInfo({ ...userInfo, ...currentUser });
-  }, []);
-
-  const updateState = (field) => (e) => {
-    const state = userInfo;
-    const newState = { ...state, [field]: e.target.value };
-    setUserInfo(newState);
+  const handleInputChange = (field: keyof UserSettingsData, value: string) => {
+    setUserInfo((prev) => ({ ...prev, [field]: value }));
   };
 
-  const submitForm = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setErrors([]);
 
-    const user = { ...userInfo };
+    try {
+      const userPayload = { ...userInfo };
 
-    if (!user.password) {
-      delete user.password;
-    }
+      if (!userPayload.password) {
+        delete userPayload.password;
+      }
 
-    const { data, status } = await axios.put(
-      `${SERVER_BASE_URL}/user`,
-      JSON.stringify({ user }),
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Token ${currentUser?.token}`,
+      const { data, status } = await axios.put(
+        `${SERVER_BASE_URL}/user`,
+        { user: userPayload },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Token ${currentUser?.token}`,
+          },
         },
-      },
-    );
+      );
 
-    setLoading(false);
-
-    if (status !== 200) {
-      setErrors(data.errors.body);
-    }
-
-    if (data?.user) {
-      window.localStorage.setItem('user', JSON.stringify(data.user));
-      mutate('user', data.user);
-      Router.push(`/`);
+      if (data?.user) {
+        localStorage.setItem('user', JSON.stringify(data.user));
+        mutate('user', data.user);
+        router.push('/');
+      }
+    } catch (error) {
+      console.error('Settings update failed:', error);
+      setErrors(['설정 업데이트 중 오류가 발생했습니다.']);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <React.Fragment>
+    <>
       <ListErrors errors={errors} />
-      <form onSubmit={submitForm}>
-        <fieldset>
+
+      <form onSubmit={handleSubmit}>
+        <fieldset disabled={isLoading}>
           <fieldset className="form-group">
             <input
               className="form-control"
-              type="text"
+              type="url"
               placeholder="URL of profile picture"
               value={userInfo.image}
-              onChange={updateState('image')}
+              onChange={(e) => handleInputChange('image', e.target.value)}
             />
           </fieldset>
 
@@ -88,7 +98,8 @@ const SettingsForm = () => {
               type="text"
               placeholder="Username"
               value={userInfo.username}
-              onChange={updateState('username')}
+              onChange={(e) => handleInputChange('username', e.target.value)}
+              required
             />
           </fieldset>
 
@@ -98,7 +109,7 @@ const SettingsForm = () => {
               rows={8}
               placeholder="Short bio about you"
               value={userInfo.bio}
-              onChange={updateState('bio')}
+              onChange={(e) => handleInputChange('bio', e.target.value)}
             />
           </fieldset>
 
@@ -108,7 +119,8 @@ const SettingsForm = () => {
               type="email"
               placeholder="Email"
               value={userInfo.email}
-              onChange={updateState('email')}
+              onChange={(e) => handleInputChange('email', e.target.value)}
+              required
             />
           </fieldset>
 
@@ -116,9 +128,9 @@ const SettingsForm = () => {
             <input
               className="form-control form-control-lg"
               type="password"
-              placeholder="New Password"
+              placeholder="New Password (leave blank to keep current)"
               value={userInfo.password}
-              onChange={updateState('password')}
+              onChange={(e) => handleInputChange('password', e.target.value)}
             />
           </fieldset>
 
@@ -127,11 +139,11 @@ const SettingsForm = () => {
             type="submit"
             disabled={isLoading}
           >
-            Update Settings
+            {isLoading ? 'Updating...' : 'Update Settings'}
           </button>
         </fieldset>
       </form>
-    </React.Fragment>
+    </>
   );
 };
 
