@@ -10,9 +10,11 @@ import storage from '../../lib/utils/storage';
 
 const Comment = ({ comment }) => {
   const { data: currentUser } = useSWR('user', storage);
+
   const isLoggedIn = checkLogin(currentUser);
-  const canModify =
-    isLoggedIn && currentUser?.username === comment?.author?.username;
+
+  const isCommentOwner = currentUser?.username === comment?.author?.username;
+  const canManage = isLoggedIn && isCommentOwner;
 
   return (
     <div className="card">
@@ -42,7 +44,7 @@ const Comment = ({ comment }) => {
         <span className="date-posted">
           {new Date(comment.createdAt).toDateString()}
         </span>
-        <Maybe test={canModify}>
+        <Maybe test={canManage}>
           <DeleteButton commentId={comment.id} />
         </Maybe>
       </div>
