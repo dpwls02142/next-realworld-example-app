@@ -7,14 +7,6 @@ import ArticleAPI from '../../lib/api/article';
 import storage from '../../lib/utils/storage';
 import EditorForm, { ArticleInput } from '../../features/editor/EditorForm';
 
-export async function getServerSideProps({ query }) {
-  const { slug } = query;
-  const {
-    data: { article },
-  } = await ArticleAPI.get(slug);
-  return { props: { article } };
-}
-
 function EditArticlePage({ article }) {
   const [errors, setErrors] = useState([]);
   const [isLoading, setLoading] = useState(false);
@@ -60,6 +52,14 @@ function EditArticlePage({ article }) {
       </div>
     </div>
   );
+}
+
+export async function getServerSideProps({ query }) {
+  const { slug } = query;
+  const {
+    data: { article },
+  } = await ArticleAPI.get(slug);
+  return { props: { article } };
 }
 
 export default EditArticlePage;

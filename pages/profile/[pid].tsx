@@ -99,9 +99,10 @@ function Profile({ initialProfile }) {
   );
 }
 
-Profile.getInitialProps = async ({ query: { pid } }) => {
+export async function getServerSideProps({ query }) {
+  const { pid } = query;
   const { data: initialProfile } = await UserAPI.get(pid);
-  return { initialProfile };
-};
+  return { props: { initialProfile } };
+}
 
 export default Profile;

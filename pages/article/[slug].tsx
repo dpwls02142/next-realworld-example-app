@@ -83,9 +83,12 @@ function ArticlePage({ initialArticle }: { initialArticle: ArticleResponse }) {
   );
 }
 
-ArticlePage.getInitialProps = async ({ query: { slug } }) => {
-  const { data } = await ArticleAPI.get(slug);
-  return data;
-};
+export async function getServerSideProps({ query }) {
+  const { slug } = query;
+  const {
+    data: { article },
+  } = await ArticleAPI.get(slug);
+  return { props: { article } };
+}
 
 export default ArticlePage;
