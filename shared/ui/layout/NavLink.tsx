@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { ReactNode } from 'react';
 
 interface NavLinkProps {
   href: string;
   as: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 const NavLink = ({ href, as, children }: NavLinkProps) => {

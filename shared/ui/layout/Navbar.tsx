@@ -1,4 +1,4 @@
-import React from 'react';
+import { useCallback } from 'react';
 import useSWR from 'swr';
 
 import CustomLink from '../../components/CustomLink';
@@ -13,7 +13,7 @@ const Navbar = () => {
   const { data: currentUser } = useSWR('user', storage);
   const isLoggedIn = checkLogin(currentUser);
 
-  const handleClick = React.useCallback(() => setPage(0), []);
+  const handleClick = useCallback(() => setPage(0), []);
 
   return (
     <nav className="navbar navbar-light">

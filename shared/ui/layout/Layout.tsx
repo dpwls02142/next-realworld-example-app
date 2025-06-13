@@ -1,13 +1,15 @@
-import React from 'react';
+import { StrictMode } from 'react';
 
 import Navbar from './Navbar';
 import Footer from './Footer';
 
 const Layout = ({ children }) => (
   <>
-    <Navbar />
-    {children}
-    <Footer />
+    <StrictMode>
+      <Navbar />
+      {children}
+      <Footer />
+    </StrictMode>
   </>
 );
 
