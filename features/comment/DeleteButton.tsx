@@ -5,9 +5,12 @@ import { trigger } from 'swr';
 import { SERVER_BASE_URL } from '../../lib/utils/constant';
 import CommentAPI from '../../lib/api/comment';
 
+const INITIAL_COUNTDOWN_SECONDS = 5;
+const COUNTDOWN_INTERVAL_MS = 1000;
+
 const DeleteButton = ({ commentId }: { commentId: string }) => {
   const [isDeleting, setIsDeleting] = useState(false);
-  const [countdown, setCountdown] = useState(5);
+  const [countdown, setCountdown] = useState(INITIAL_COUNTDOWN_SECONDS);
   const router = useRouter();
 
   const {
@@ -27,19 +30,19 @@ const DeleteButton = ({ commentId }: { commentId: string }) => {
 
     const commentDeleteTimer = setTimeout(() => {
       setCountdown(countdown - 1);
-    }, 1000);
+    }, COUNTDOWN_INTERVAL_MS);
 
     return () => clearTimeout(commentDeleteTimer);
   }, [isDeleting, countdown, slug, commentId]);
 
   function DeleteComment() {
     setIsDeleting(true);
-    setCountdown(5);
+    setCountdown(INITIAL_COUNTDOWN_SECONDS);
   }
 
   function DeleteCancel() {
     setIsDeleting(false);
-    setCountdown(5);
+    setCountdown(INITIAL_COUNTDOWN_SECONDS);
   }
 
   return (
