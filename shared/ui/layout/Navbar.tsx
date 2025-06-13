@@ -16,7 +16,7 @@ const Navbar = () => {
   const handleClick = useCallback(() => setPage(0), []);
 
   return (
-    <nav className="navbar navbar-light">
+    <nav className="navbar navbar-light navbar-fixe">
       <div className="container">
         <CustomLink className="navbar-brand" href="/" as="/">
           <span onClick={handleClick}>conduit</span>
