@@ -4,6 +4,8 @@ import { trigger } from 'swr';
 import { SERVER_BASE_URL } from '../../lib/utils/constant';
 import CommentAPI from '../../lib/api/comment';
 
+const CONFIRM_DELETE_MESSAGE = `Do you really want to delete it?`;
+
 const DeleteButton = ({ commentId }: { commentId: string }) => {
   const router = useRouter();
   const {
@@ -11,6 +13,10 @@ const DeleteButton = ({ commentId }: { commentId: string }) => {
   } = router;
 
   const handleDelete = async (commentId: string) => {
+    const result = window.confirm(CONFIRM_DELETE_MESSAGE);
+
+    if (!result) return;
+
     await CommentAPI.delete(slug as string, commentId);
     trigger(`${SERVER_BASE_URL}/articles/${slug}/comments`);
   };
