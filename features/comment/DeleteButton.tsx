@@ -1,26 +1,17 @@
-import axios from 'axios';
 import { useRouter } from 'next/router';
-import useSWR, { trigger } from 'swr';
+import { trigger } from 'swr';
 
 import { SERVER_BASE_URL } from '../../lib/utils/constant';
-import storage from '../../lib/utils/storage';
+import CommentAPI from '../../lib/api/comment';
 
-const DeleteButton = ({ commentId }) => {
-  const { data: currentUser } = useSWR('user', storage);
+const DeleteButton = ({ commentId }: { commentId: string }) => {
   const router = useRouter();
   const {
     query: { slug },
   } = router;
 
-  const handleDelete = async (commentId) => {
-    await axios.delete(
-      `${SERVER_BASE_URL}/articles/${slug}/comments/${commentId}`,
-      {
-        headers: {
-          Authorization: `Token ${currentUser?.token}`,
-        },
-      },
-    );
+  const handleDelete = async (commentId: string) => {
+    await CommentAPI.delete(slug as string, commentId);
     trigger(`${SERVER_BASE_URL}/articles/${slug}/comments`);
   };
 
