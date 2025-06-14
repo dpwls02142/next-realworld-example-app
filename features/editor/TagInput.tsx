@@ -32,7 +32,9 @@ const TagInput = ({ tagList, addTag, removeTag }) => {
   return (
     <>
       <fieldset className="form-group">
+        <label htmlFor="tag-input">태그</label>
         <input
+          id="tag-input"
           className="form-control"
           type="text"
           placeholder="Enter tags"
