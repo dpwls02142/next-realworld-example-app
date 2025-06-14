@@ -19,7 +19,7 @@ const RegisterForm = () => {
     email: '',
     password: '',
   });
-
+  const [showPassword, setShowPassword] = useState(false);
   const handleInputChange = (field: keyof RegisterFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
@@ -88,15 +88,31 @@ const RegisterForm = () => {
 
           <div className="form-group">
             <label htmlFor="register-password">비밀번호</label>
-            <input
-              id="register-password"
-              className="form-control form-control-lg"
-              type="password"
-              placeholder="Password"
-              value={formData.password}
-              onChange={(e) => handleInputChange('password', e.target.value)}
-              required
-            />
+            <div style={{ position: 'relative' }}>
+              <input
+                id="register-password"
+                className="form-control form-control-lg"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Password"
+                value={formData.password}
+                onChange={(e) => handleInputChange('password', e.target.value)}
+              />
+              <i
+                className={showPassword ? 'ion-eye-disabled' : 'ion-eye'}
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  right: '20px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '18px',
+                  color: '#999',
+                }}
+              />
+            </div>
           </div>
 
           <button
