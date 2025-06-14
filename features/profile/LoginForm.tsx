@@ -63,6 +63,7 @@ const LoginForm = () => {
               placeholder="Email"
               value={formData.email}
               onChange={(e) => handleInputChange('email', e.target.value)}
+              required
             />
           </fieldset>
 
@@ -76,6 +77,7 @@ const LoginForm = () => {
                 placeholder="Password"
                 value={formData.password}
                 onChange={(e) => handleInputChange('password', e.target.value)}
+                required
               />
               <i
                 className={showPassword ? 'ion-eye-disabled' : 'ion-eye'}

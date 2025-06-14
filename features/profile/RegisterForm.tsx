@@ -96,6 +96,7 @@ const RegisterForm = () => {
                 placeholder="Password"
                 value={formData.password}
                 onChange={(e) => handleInputChange('password', e.target.value)}
+                required
               />
               <i
                 className={showPassword ? 'ion-eye-disabled' : 'ion-eye'}
