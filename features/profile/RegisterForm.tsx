@@ -61,7 +61,9 @@ const RegisterForm = () => {
       <form onSubmit={handleSubmit}>
         <fieldset disabled={isLoading}>
           <div className="form-group">
+            <label htmlFor="register-username">사용자명</label>
             <input
+              id="register-username"
               className="form-control form-control-lg"
               type="text"
               placeholder="Username"
@@ -72,7 +74,9 @@ const RegisterForm = () => {
           </div>
 
           <div className="form-group">
+            <label htmlFor="register-email">이메일</label>
             <input
+              id="register-email"
               className="form-control form-control-lg"
               type="email"
               placeholder="Email"
@@ -83,7 +87,9 @@ const RegisterForm = () => {
           </div>
 
           <div className="form-group">
+            <label htmlFor="register-password">비밀번호</label>
             <input
+              id="register-password"
               className="form-control form-control-lg"
               type="password"
               placeholder="Password"
