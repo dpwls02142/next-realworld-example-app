@@ -5,6 +5,7 @@ interface TextInputProps {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   className?: string;
+  id?: string;
 }
 
 const TextInput = ({
@@ -12,8 +13,10 @@ const TextInput = ({
   value,
   onChange,
   className = '',
+  id,
 }: TextInputProps) => (
   <input
+    id={id}
     type="text"
     placeholder={placeholder}
     className={`form-control ${className}`}

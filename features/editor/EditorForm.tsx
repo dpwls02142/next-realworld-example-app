@@ -54,7 +54,9 @@ const EditorForm = ({
 
       <fieldset>
         <fieldset className="form-group">
+          <label htmlFor="article-title">제목</label>
           <TextInput
+            id="article-title"
             placeholder="Article Title"
             value={posting.title}
             onChange={handleChange('SET_TITLE')}
@@ -63,7 +65,9 @@ const EditorForm = ({
         </fieldset>
 
         <fieldset className="form-group">
+          <label htmlFor="article-description">설명</label>
           <TextInput
+            id="article-description"
             placeholder="What's this article about?"
             value={posting.description}
             onChange={handleChange('SET_DESCRIPTION')}
@@ -71,6 +75,7 @@ const EditorForm = ({
         </fieldset>
 
         <fieldset className="form-group">
+          <label htmlFor="article-body">내용</label>
           <QuillEditor
             placeholder="아티클 내용을 작성해주세요..."
             value={posting.body}

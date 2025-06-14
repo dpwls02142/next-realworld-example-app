@@ -19,7 +19,7 @@ const RegisterForm = () => {
     email: '',
     password: '',
   });
-
+  const [showPassword, setShowPassword] = useState(false);
   const handleInputChange = (field: keyof RegisterFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
@@ -61,7 +61,9 @@ const RegisterForm = () => {
       <form onSubmit={handleSubmit}>
         <fieldset disabled={isLoading}>
           <div className="form-group">
+            <label htmlFor="register-username">사용자명</label>
             <input
+              id="register-username"
               className="form-control form-control-lg"
               type="text"
               placeholder="Username"
@@ -72,7 +74,9 @@ const RegisterForm = () => {
           </div>
 
           <div className="form-group">
+            <label htmlFor="register-email">이메일</label>
             <input
+              id="register-email"
               className="form-control form-control-lg"
               type="email"
               placeholder="Email"
@@ -83,14 +87,33 @@ const RegisterForm = () => {
           </div>
 
           <div className="form-group">
-            <input
-              className="form-control form-control-lg"
-              type="password"
-              placeholder="Password"
-              value={formData.password}
-              onChange={(e) => handleInputChange('password', e.target.value)}
-              required
-            />
+            <label htmlFor="register-password">비밀번호</label>
+            <div style={{ position: 'relative' }}>
+              <input
+                id="register-password"
+                className="form-control form-control-lg"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Password"
+                value={formData.password}
+                onChange={(e) => handleInputChange('password', e.target.value)}
+                required
+              />
+              <i
+                className={showPassword ? 'ion-eye-disabled' : 'ion-eye'}
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  right: '20px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '18px',
+                  color: '#999',
+                }}
+              />
+            </div>
           </div>
 
           <button

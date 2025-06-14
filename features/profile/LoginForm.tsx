@@ -17,6 +17,7 @@ const LoginForm = () => {
     email: '',
     password: '',
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -54,23 +55,46 @@ const LoginForm = () => {
       <form onSubmit={handleSubmit}>
         <fieldset>
           <fieldset className="form-group">
+            <label htmlFor="login-email">이메일</label>
             <input
+              id="login-email"
               className="form-control form-control-lg"
               type="email"
               placeholder="Email"
               value={formData.email}
               onChange={(e) => handleInputChange('email', e.target.value)}
+              required
             />
           </fieldset>
 
           <fieldset className="form-group">
-            <input
-              className="form-control form-control-lg"
-              type="password"
-              placeholder="Password"
-              value={formData.password}
-              onChange={(e) => handleInputChange('password', e.target.value)}
-            />
+            <label htmlFor="login-password">비밀번호</label>
+            <div style={{ position: 'relative' }}>
+              <input
+                id="login-password"
+                className="form-control form-control-lg"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Password"
+                value={formData.password}
+                onChange={(e) => handleInputChange('password', e.target.value)}
+                required
+              />
+              <i
+                className={showPassword ? 'ion-eye-disabled' : 'ion-eye'}
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  right: '20px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '18px',
+                  color: '#999',
+                }}
+              />
+            </div>
           </fieldset>
 
           <button

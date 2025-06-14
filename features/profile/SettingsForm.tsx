@@ -22,6 +22,7 @@ const SettingsForm = () => {
 
   const [isLoading, setLoading] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
+  const [showPassword, setShowPassword] = useState(false);
   const [userInfo, setUserInfo] = useState<UserSettingsData>({
     image: '',
     username: '',
@@ -83,7 +84,9 @@ const SettingsForm = () => {
       <form onSubmit={handleSubmit}>
         <fieldset disabled={isLoading}>
           <fieldset className="form-group">
+            <label htmlFor="profile-image">프로필 이미지 URL</label>
             <input
+              id="profile-image"
               className="form-control"
               type="url"
               placeholder="URL of profile picture"
@@ -93,7 +96,9 @@ const SettingsForm = () => {
           </fieldset>
 
           <fieldset className="form-group">
+            <label htmlFor="username">사용자명</label>
             <input
+              id="username"
               className="form-control form-control-lg"
               type="text"
               placeholder="Username"
@@ -104,17 +109,21 @@ const SettingsForm = () => {
           </fieldset>
 
           <fieldset className="form-group">
+            <label htmlFor="bio">자기소개</label>
             <textarea
+              id="bio"
               className="form-control form-control-lg"
-              rows={8}
               placeholder="Short bio about you"
               value={userInfo.bio}
               onChange={(e) => handleInputChange('bio', e.target.value)}
+              style={{ overflow: 'auto', resize: 'none' }}
             />
           </fieldset>
 
           <fieldset className="form-group">
+            <label htmlFor="email">이메일</label>
             <input
+              id="email"
               className="form-control form-control-lg"
               type="email"
               placeholder="Email"
@@ -125,13 +134,32 @@ const SettingsForm = () => {
           </fieldset>
 
           <fieldset className="form-group">
-            <input
-              className="form-control form-control-lg"
-              type="password"
-              placeholder="New Password (leave blank to keep current)"
-              value={userInfo.password}
-              onChange={(e) => handleInputChange('password', e.target.value)}
-            />
+            <label htmlFor="password">새 비밀번호</label>
+            <div style={{ position: 'relative' }}>
+              <input
+                id="password"
+                className="form-control form-control-lg"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="New Password (leave blank to keep current)"
+                value={userInfo.password}
+                onChange={(e) => handleInputChange('password', e.target.value)}
+              />
+              <i
+                className={showPassword ? 'ion-eye-disabled' : 'ion-eye'}
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  right: '20px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '18px',
+                  color: '#999',
+                }}
+              />
+            </div>
           </fieldset>
 
           <button

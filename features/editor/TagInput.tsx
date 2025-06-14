@@ -19,42 +19,70 @@ const TagInput = ({ tagList, addTag, removeTag }) => {
   };
 
   const handleAddTag = () => {
-    if (!!tag) {
-      addTag(tag);
+    const trimmedTag = tag.trim();
+    const isDuplicate = tagList.includes(trimmedTag);
+    if (trimmedTag && !isDuplicate) {
+      addTag(trimmedTag);
+      setTag('');
+    } else if (isDuplicate) {
+      alert('이미 추가된 태그입니다.');
       setTag('');
     }
   };
 
-  const handleRemoveTag = (tag) => {
-    removeTag(tag);
+  const handleRemoveTag = (tagToRemove) => {
+    removeTag(tagToRemove);
   };
 
   return (
-    <>
+    <div>
       <fieldset className="form-group">
-        <input
-          className="form-control"
-          type="text"
-          placeholder="Enter tags"
-          value={tag}
-          onChange={changeTagInput}
-          onBlur={handleAddTag}
-          onKeyDown={handleTagInputKeyDown}
-        />
+        <label htmlFor="tag-input">태그</label>
+        <div style={{ position: 'relative' }}>
+          <input
+            id="tag-input"
+            className="form-control"
+            type="text"
+            placeholder="태그를 입력해주세요 (Enter, Tab, 쉼표로 추가할 수 있어요)"
+            value={tag}
+            onChange={changeTagInput}
+            onBlur={handleAddTag}
+            onKeyDown={handleTagInputKeyDown}
+          />
+          {tag.trim() && (
+            <i
+              className="ion-plus-round"
+              onClick={handleAddTag}
+              style={{
+                position: 'absolute',
+                right: '10px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                cursor: 'pointer',
+                color: '#5cb85c',
+              }}
+            />
+          )}
+        </div>
 
-        <div className="tag-list">
-          {tagList.map((tag, index) => (
+        <div className="tag-list" style={{ marginTop: '10px' }}>
+          {tagList.map((tagItem, index) => (
             <span className="tag-default tag-pill" key={index}>
+              {tagItem}
               <i
                 className="ion-close-round"
-                onClick={() => handleRemoveTag(tag)}
+                onClick={() => handleRemoveTag(tagItem)}
+                style={{
+                  marginLeft: '6px',
+                  cursor: 'pointer',
+                  fontSize: '10px',
+                }}
               />
-              {tag}
             </span>
           ))}
         </div>
       </fieldset>
-    </>
+    </div>
   );
 };
 
