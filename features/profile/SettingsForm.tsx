@@ -112,10 +112,10 @@ const SettingsForm = () => {
             <textarea
               id="bio"
               className="form-control form-control-lg"
-              rows={8}
               placeholder="Short bio about you"
               value={userInfo.bio}
               onChange={(e) => handleInputChange('bio', e.target.value)}
+              style={{ overflow: 'auto', resize: 'none' }}
             />
           </fieldset>
 
