@@ -5,11 +5,13 @@ import Router from 'next/router';
 import storage from '../../lib/utils/storage';
 import ArticleAPI from '../../lib/api/article';
 import EditorForm, { ArticleInput } from '../../features/editor/EditorForm';
+import { usePageDispatch } from '../../lib/context/PageContext';
 
 function NewArticlePage() {
   const [errors, setErrors] = useState([]);
   const [isLoading, setLoading] = useState(false);
   const { data: currentUser } = useSWR('user', storage);
+  const setPage = usePageDispatch();
 
   const handleSubmit = async (newData: ArticleInput) => {
     setLoading(true);
@@ -18,7 +20,10 @@ function NewArticlePage() {
       const response = await ArticleAPI.create(newData, currentUser.token);
 
       if (response.status === 200 || response.status === 201) {
-        Router.push('/');
+        setPage(0);
+        Router.push(`/`).then(() => {
+          window.scrollTo(0, 0);
+        });
         return;
       }
     } catch (error) {
