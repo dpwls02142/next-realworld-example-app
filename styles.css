@@ -25,6 +25,10 @@ img.lazyload:not([src]) {
   background-color: white;
 }
 
+.btn-sm {
+  margin-right: 10px;
+}
+
 body {
   padding-top: 60px;
 }
