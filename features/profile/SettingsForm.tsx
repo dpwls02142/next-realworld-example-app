@@ -83,7 +83,9 @@ const SettingsForm = () => {
       <form onSubmit={handleSubmit}>
         <fieldset disabled={isLoading}>
           <fieldset className="form-group">
+            <label htmlFor="profile-image">프로필 이미지 URL</label>
             <input
+              id="profile-image"
               className="form-control"
               type="url"
               placeholder="URL of profile picture"
@@ -93,7 +95,9 @@ const SettingsForm = () => {
           </fieldset>
 
           <fieldset className="form-group">
+            <label htmlFor="username">사용자명</label>
             <input
+              id="username"
               className="form-control form-control-lg"
               type="text"
               placeholder="Username"
@@ -104,7 +108,9 @@ const SettingsForm = () => {
           </fieldset>
 
           <fieldset className="form-group">
+            <label htmlFor="bio">자기소개</label>
             <textarea
+              id="bio"
               className="form-control form-control-lg"
               rows={8}
               placeholder="Short bio about you"
@@ -114,7 +120,9 @@ const SettingsForm = () => {
           </fieldset>
 
           <fieldset className="form-group">
+            <label htmlFor="email">이메일</label>
             <input
+              id="email"
               className="form-control form-control-lg"
               type="email"
               placeholder="Email"
@@ -125,7 +133,9 @@ const SettingsForm = () => {
           </fieldset>
 
           <fieldset className="form-group">
+            <label htmlFor="password">새 비밀번호</label>
             <input
+              id="password"
               className="form-control form-control-lg"
               type="password"
               placeholder="New Password (leave blank to keep current)"
