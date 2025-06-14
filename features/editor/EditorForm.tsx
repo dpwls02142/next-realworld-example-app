@@ -3,9 +3,8 @@ import ListErrors from '../../shared/components/ListErrors';
 import TagInput from './TagInput';
 import editorReducer from '../../lib/utils/editorReducer';
 import validateArticle from '../../lib/utils/validateArticle';
-
 import TextInput from '../../shared/ui/input/TextInput';
-import TextArea from '../../shared/ui/input/TextArea';
+import QuillEditor from '../../shared/ui/input/QuillEditor';
 import SubmitButton from '../../shared/ui/button/SubmitButton';
 
 export interface ArticleInput {
@@ -34,6 +33,10 @@ const EditorForm = ({
 
   const handleChange = (type: string) => (e: any) =>
     dispatch({ type, text: e.target.value });
+
+  const handleQuillChange = (content: string) => {
+    dispatch({ type: 'SET_BODY', text: content });
+  };
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -68,10 +71,10 @@ const EditorForm = ({
         </fieldset>
 
         <fieldset className="form-group">
-          <TextArea
-            placeholder="Write your article (in markdown)"
+          <QuillEditor
+            placeholder="아티클 내용을 작성해주세요..."
             value={posting.body}
-            onChange={handleChange('SET_BODY')}
+            onChange={handleQuillChange}
           />
         </fieldset>
 

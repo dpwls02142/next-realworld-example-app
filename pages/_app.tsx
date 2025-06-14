@@ -4,6 +4,7 @@ import React from 'react';
 import Layout from '../shared/ui/layout/Layout';
 import ContextProvider from 'lib/context';
 import 'styles.css';
+import 'react-quill/dist/quill.snow.css';
 
 if (typeof window !== 'undefined') {
   require('lazysizes/plugins/attrchange/ls.attrchange.js');
