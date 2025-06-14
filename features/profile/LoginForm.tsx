@@ -54,7 +54,9 @@ const LoginForm = () => {
       <form onSubmit={handleSubmit}>
         <fieldset>
           <fieldset className="form-group">
+            <label htmlFor="login-email">이메일</label>
             <input
+              id="login-email"
               className="form-control form-control-lg"
               type="email"
               placeholder="Email"
@@ -64,7 +66,9 @@ const LoginForm = () => {
           </fieldset>
 
           <fieldset className="form-group">
+            <label htmlFor="login-password">비밀번호</label>
             <input
+              id="login-password"
               className="form-control form-control-lg"
               type="password"
               placeholder="Password"
