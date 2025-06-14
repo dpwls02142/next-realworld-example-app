@@ -1,4 +1,3 @@
-import marked from 'marked';
 import { useRouter } from 'next/router';
 import React from 'react';
 import useSWR from 'swr';
@@ -23,7 +22,7 @@ function ArticleBanner({ article }: { article: ArticleType }) {
 
 function ArticleBody({ article }: { article: ArticleType }) {
   const htmlContent = {
-    __html: marked(article.body, { sanitize: true }),
+    __html: article.body,
   };
 
   return (
