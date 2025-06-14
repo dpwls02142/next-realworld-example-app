@@ -23,6 +23,9 @@
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-prettier": "^5.4.1",
     "prettier": "^3.5.3",
+    "quill": "^2.0.3",
+    "react-quill": "^2.0.0",
+    "turndown": "^7.2.0",
     "typescript": "^3.9.7"
   },
   "volta": {
