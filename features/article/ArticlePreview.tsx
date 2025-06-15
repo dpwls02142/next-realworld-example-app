@@ -1,4 +1,3 @@
-import axios from 'axios';
 import Link from 'next/link';
 import Router from 'next/router';
 import { useState } from 'react';
@@ -8,9 +7,9 @@ import CustomLink from '../../shared/components/CustomLink';
 import ArticleMeta from '../../features/article/ArticleMeta';
 import { usePageDispatch } from '../../lib/context/PageContext';
 import checkLogin from '../../lib/utils/checkLogin';
-import { SERVER_BASE_URL } from '../../lib/utils/constant';
-import storage from '../../lib/utils/storage';
+import { getCurrentUser } from '../../lib/utils/supabase/client';
 import { ArticleType } from '../../lib/types/articleType';
+import ArticleAPI from '../../lib/api/article';
 
 type ArticleProps = {
   article: ArticleType;
@@ -22,7 +21,7 @@ const ArticlePreview = ({ article }: ArticleProps) => {
   const [hover, setHover] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(-1);
 
-  const { data: currentUser } = useSWR('user', storage);
+  const { data: currentUser } = useSWR('user', getCurrentUser);
   const isLoggedIn = checkLogin(currentUser);
 
   const toggleFavorite = async () => {
@@ -33,29 +32,26 @@ const ArticlePreview = ({ article }: ArticleProps) => {
 
     const nextFavorited = !preview.favorited;
     const nextFavoritesCount = nextFavorited
-      ? preview.favoritesCount + 1
-      : preview.favoritesCount - 1;
+      ? (preview.favorites_count || 0) + 1
+      : (preview.favorites_count || 0) - 1;
 
     setPreview({
       ...preview,
       favorited: nextFavorited,
-      favoritesCount: nextFavoritesCount,
+      favorites_count: nextFavoritesCount,
     });
 
-    const config = {
-      headers: { Authorization: `Token ${currentUser?.token}` },
-    };
-
     try {
-      const url = `${SERVER_BASE_URL}/articles/${preview.slug}/favorite`;
-      nextFavorited
-        ? await axios.post(url, {}, config)
-        : await axios.delete(url, config);
+      if (nextFavorited) {
+        await ArticleAPI.favorite(preview.id.toString());
+      } else {
+        await ArticleAPI.unfavorite(preview.id.toString());
+      }
     } catch {
       setPreview({
         ...preview,
         favorited: !nextFavorited,
-        favoritesCount: preview.favoritesCount,
+        favorites_count: preview.favorites_count,
       });
     }
   };
@@ -80,21 +76,21 @@ const ArticlePreview = ({ article }: ArticleProps) => {
             }
             onClick={toggleFavorite}
           >
-            <i className="ion-heart" /> {preview.favoritesCount}
+            <i className="ion-heart" /> {preview.favorites_count || 0}
           </button>
         </div>
       </div>
 
       <CustomLink
-        href="/article/[pid]"
-        as={`/article/${preview.slug}`}
+        href="/article/[id]/[title]"
+        as={`/article/${preview.id}/${encodeURIComponent(preview.title)}`}
         className="preview-link"
       >
         <h1>{preview.title}</h1>
-        <p>{preview.description}</p>
+        <p>{preview.summary}</p>
         <span>Read more...</span>
         <ul className="tag-list" style={{ maxWidth: '100%' }}>
-          {preview.tagList.map((tag, index) => (
+          {(preview.tags || []).map((tag, index) => (
             <Link
               href={`/?tag=${tag}`}
               as={`/?tag=${tag}`}

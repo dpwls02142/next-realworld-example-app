@@ -32,7 +32,7 @@ const ArticleMeta = ({
           {article.author?.username}
         </CustomLink>
         <span className="date">
-          {new Date(article.createdAt).toDateString()}
+          {new Date(article.created_at).toDateString()}
         </span>
       </div>
 
