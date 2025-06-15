@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { trigger } from 'swr';
 
-import { SERVER_BASE_URL } from '../../lib/utils/constant';
 import CommentAPI from '../../lib/api/comment';
 
 const INITIAL_COUNTDOWN_SECONDS = 5;
@@ -14,15 +13,15 @@ const DeleteButton = ({ commentId }: { commentId: string }) => {
   const router = useRouter();
 
   const {
-    query: { slug },
+    query: { id },
   } = router;
 
   useEffect(() => {
     if (!isDeleting) return;
 
     if (countdown === 0) {
-      CommentAPI.delete(slug as string, commentId).then(() => {
-        trigger(`${SERVER_BASE_URL}/articles/${slug}/comments`);
+      CommentAPI.delete(id as string, commentId).then(() => {
+        trigger(['comments', id]);
         setIsDeleting(false);
       });
       return;
@@ -33,7 +32,7 @@ const DeleteButton = ({ commentId }: { commentId: string }) => {
     }, COUNTDOWN_INTERVAL_MS);
 
     return () => clearTimeout(commentDeleteTimer);
-  }, [isDeleting, countdown, slug, commentId]);
+  }, [isDeleting, countdown, id, commentId]);
 
   function DeleteComment() {
     setIsDeleting(true);
