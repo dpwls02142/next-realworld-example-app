@@ -7,12 +7,12 @@ import TextInput from '../../shared/ui/input/TextInput';
 import QuillEditor from '../../shared/ui/input/QuillEditor';
 import SubmitButton from '../../shared/ui/button/SubmitButton';
 
-export interface ArticleInput {
+export type ArticleInput = {
   title: string;
-  description: string;
-  body: string;
-  tagList: string[];
-}
+  summary: string;
+  content: string;
+  tags: string[];
+};
 
 interface EditorFormProps {
   initialValues: ArticleInput;
@@ -35,7 +35,7 @@ const EditorForm = ({
     dispatch({ type, text: e.target.value });
 
   const handleQuillChange = (content: string) => {
-    dispatch({ type: 'SET_BODY', text: content });
+    dispatch({ type: 'SET_CONTENT', text: content });
   };
 
   const handleSubmit = (e: FormEvent) => {
@@ -65,26 +65,26 @@ const EditorForm = ({
         </fieldset>
 
         <fieldset className="form-group">
-          <label htmlFor="article-description">설명</label>
+          <label htmlFor="article-summary">설명</label>
           <TextInput
-            id="article-description"
+            id="article-summary"
             placeholder="What's this article about?"
-            value={posting.description}
-            onChange={handleChange('SET_DESCRIPTION')}
+            value={posting.summary}
+            onChange={handleChange('SET_SUMMARY')}
           />
         </fieldset>
 
         <fieldset className="form-group">
-          <label htmlFor="article-body">내용</label>
+          <label htmlFor="article-content">내용</label>
           <QuillEditor
             placeholder="아티클 내용을 작성해주세요..."
-            value={posting.body}
+            value={posting.content}
             onChange={handleQuillChange}
           />
         </fieldset>
 
         <TagInput
-          tagList={posting.tagList}
+          tagList={posting.tags}
           addTag={(tag) => dispatch({ type: 'ADD_TAG', tag })}
           removeTag={(tag) => dispatch({ type: 'REMOVE_TAG', tag })}
         />
