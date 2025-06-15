@@ -4,7 +4,7 @@
   "author": "reck1ess",
   "scripts": {
     "dev": "next dev -p 4000",
-    "build": "next build",
+    "build": "NODE_OPTIONS=--openssl-legacy-provider next build",
     "start": "next start -p 4000"
   },
   "dependencies": {
