@@ -1,3 +1,5 @@
-export interface TagList {
-  tags: string[];
+export interface Tag {
+  id: number;
+  name: string;
+  slug: string;
 }

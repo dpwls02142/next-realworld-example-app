@@ -13,8 +13,8 @@ import {
   usePageCountDispatch,
 } from '../../lib/context/PageCountContext';
 import useViewport from '../../lib/hooks/useViewport';
-import { SERVER_BASE_URL, DEFAULT_LIMIT } from '../../lib/utils/constant';
-import fetcher from '../../lib/utils/fetcher';
+import { DEFAULT_LIMIT } from '../../lib/utils/constant';
+import ArticleAPI from '../../lib/api/article';
 
 const PAGINATION_THRESHOLD = 20;
 const MAX_PAGE_COUNT = 480;
@@ -33,7 +33,7 @@ const ArticleList = () => {
   const setPageCount = usePageCountDispatch();
   const { vw } = useViewport();
   const router = useRouter();
-  const { asPath, pathname, query } = router;
+  const { pathname, query } = router;
   const { favorite, follow, tag, pid } = query;
 
   const isProfilePage = pathname.startsWith('/profile');
@@ -52,42 +52,57 @@ const ArticleList = () => {
 
   const lastIndex = calculateLastIndex(pageCount);
 
-  function buildFetchURL() {
-    const baseOffset = page * DEFAULT_LIMIT;
-
+  function buildFetchKey() {
     if (isTagPage) {
-      return `${SERVER_BASE_URL}/articles${asPath}&offset=${baseOffset}`;
+      return ['articles', 'tag', tag, page];
     }
 
     if (isFavoritePage) {
-      return `${SERVER_BASE_URL}/articles?favorited=${encodeURIComponent(
-        String(pid),
-      )}&offset=${baseOffset}`;
+      return ['articles', 'favorited', pid, page];
     }
 
     if (isAuthorPage) {
-      return `${SERVER_BASE_URL}/articles?author=${encodeURIComponent(
-        String(pid),
-      )}&offset=${baseOffset}`;
+      return ['articles', 'author', pid, page];
     }
 
     if (isFeedPage) {
-      return `${SERVER_BASE_URL}/articles/feed?offset=${baseOffset}`;
+      return ['articles', 'feed', page];
     }
 
-    return `${SERVER_BASE_URL}/articles?offset=${baseOffset}`;
+    return ['articles', 'all', page];
   }
 
-  const fetchURL = buildFetchURL();
-  const { data, error } = useSWR(fetchURL, fetcher);
+  async function fetchArticles() {
+    if (isTagPage) {
+      return await ArticleAPI.byTag(String(tag), page);
+    }
+
+    if (isFavoritePage) {
+      return await ArticleAPI.favoritedBy(String(pid), page);
+    }
+
+    if (isAuthorPage) {
+      return await ArticleAPI.byAuthor(String(pid), page, DEFAULT_LIMIT);
+    }
+
+    if (isFeedPage) {
+      return await ArticleAPI.feed(page);
+    }
+
+    return await ArticleAPI.all(page);
+  }
+
+  const fetchKey = buildFetchKey();
+  const { data, error } = useSWR(fetchKey, fetchArticles);
 
   useEffect(() => {
-    if (data?.articlesCount) {
-      setPageCount(data.articlesCount);
+    if (data?.data?.articlesCount) {
+      setPageCount(data.data.articlesCount);
     }
-  }, [data?.articlesCount, setPageCount]);
+  }, [data?.data?.articlesCount, setPageCount]);
 
-  const { articles = [], articlesCount = 0 } = data || {};
+  const articles = data?.data?.articles || [];
+  const articlesCount = data?.data?.articlesCount || 0;
 
   if (error) {
     return (
@@ -105,7 +120,7 @@ const ArticleList = () => {
   if (articles.length === 0) {
     return <div className="article-preview">{ERROR_MESSAGES.NO_ARTICLES}</div>;
   }
-  
+
   const shouldShowPagination =
     articlesCount && articlesCount > PAGINATION_THRESHOLD;
   const paginationPageCount =
@@ -114,7 +129,7 @@ const ArticleList = () => {
   return (
     <>
       {articles?.map((article) => (
-        <ArticlePreview key={article.slug} article={article} />
+        <ArticlePreview key={article.id} article={article} />
       ))}
 
       <Maybe test={shouldShowPagination}>
@@ -124,7 +139,7 @@ const ArticleList = () => {
           pageCount={paginationPageCount}
           currentPage={page}
           lastIndex={lastIndex}
-          fetchURL={fetchURL}
+          fetchURL=""
         />
       </Maybe>
     </>

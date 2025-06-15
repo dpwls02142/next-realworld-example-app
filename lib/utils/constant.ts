@@ -1,4 +1,4 @@
-export const SERVER_BASE_URL = `http://localhost:8000/api`;
+export const SERVER_BASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 
 export const APP_NAME = `conduit`;
 

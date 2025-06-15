@@ -3,10 +3,10 @@ import useSWR from 'swr';
 import CustomLink from '../../shared/components/CustomLink';
 import NavLink from '../../shared/ui/layout/NavLink';
 import checkLogin from '../../lib/utils/checkLogin';
-import storage from '../../lib/utils/storage';
+import { getCurrentUser } from '../../lib/utils/supabase/client';
 
 const TabList = () => {
-  const { data: currentUser } = useSWR('user', storage);
+  const { data: currentUser } = useSWR('user', getCurrentUser);
   const isLoggedIn = checkLogin(currentUser);
   const router = useRouter();
   const {
@@ -29,11 +29,8 @@ const TabList = () => {
     <ul className="nav nav-pills outline-active">
       {isLoggedIn && (
         <li className="nav-item">
-          <NavLink
-            href={`/?user=${currentUser?.username}`}
-            as={`/?user=${currentUser?.username}`}
-          >
-            Your Feed
+          <NavLink href="/?follow=true" as="/?follow=true">
+            Follow Feed
           </NavLink>
         </li>
       )}

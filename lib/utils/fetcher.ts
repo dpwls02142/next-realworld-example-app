@@ -1,23 +1,27 @@
 import axios from 'axios';
+import { supabase } from './supabase/client';
 
-const updateOptions = () => {
+const updateOptions = async () => {
   if (typeof window === 'undefined') return {};
 
-  if (!window.localStorage.user) return {};
+  // Supabase 세션에서 토큰 가져오기
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
 
-  if (Object.keys(window.localStorage.user).length === 0) return {};
-
-  const user = JSON.parse(window.localStorage.user);
-
-  if (!!user.token) {
+  if (session?.access_token) {
     return {
       headers: {
-        Authorization: `Token ${user.token}`,
+        Authorization: `Bearer ${session.access_token}`,
       },
     };
   }
+
+  return {};
 };
+
 export default async function (url) {
-  const { data } = await axios.get(url, updateOptions());
+  const options = await updateOptions();
+  const { data } = await axios.get(url, options);
   return data;
 }

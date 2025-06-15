@@ -1,13 +1,11 @@
 import { useRouter } from 'next/router';
-import React from 'react';
 import useSWR from 'swr';
-
-import ArticleMeta from '../../features/article/ArticleMeta';
-import CommentList from '../../features/comment/CommentList';
-import ArticleAPI from '../../lib/api/article';
-import { ArticleType, ArticleResponse } from '../../lib/types/articleType';
-import { SERVER_BASE_URL } from '../../lib/utils/constant';
-import fetcher from '../../lib/utils/fetcher';
+import ArticleMeta from '../../../features/article/ArticleMeta';
+import CommentList from '../../../features/comment/CommentList';
+import ArticleAPI from '../../../lib/api/article';
+import { ArticleType, ArticleResponse } from '../../../lib/types/articleType';
+import { SERVER_BASE_URL } from '../../../lib/utils/constant';
+import fetcher from '../../../lib/utils/fetcher';
 
 function ArticleBanner({ article }: { article: ArticleType }) {
   return (
@@ -22,7 +20,7 @@ function ArticleBanner({ article }: { article: ArticleType }) {
 
 function ArticleBody({ article }: { article: ArticleType }) {
   const htmlContent = {
-    __html: article.body,
+    __html: article.content,
   };
 
   return (
@@ -30,7 +28,7 @@ function ArticleBody({ article }: { article: ArticleType }) {
       <div className="col-xs-12">
         <div dangerouslySetInnerHTML={htmlContent} />
         <ul className="tag-list">
-          {article.tagList.map((tag) => (
+          {(article.tags || []).map((tag) => (
             <li key={tag} className="tag-default tag-pill tag-outline">
               {tag}
             </li>
@@ -54,17 +52,16 @@ function CommentsSection() {
 function ArticlePage({ initialArticle }: { initialArticle: ArticleResponse }) {
   const router = useRouter();
   const {
-    query: { slug },
+    query: { id },
   } = router;
 
   const { data: fetchedArticle } = useSWR(
-    `${SERVER_BASE_URL}/articles/${encodeURIComponent(String(slug))}`,
+    id ? `${SERVER_BASE_URL}/articles/${id}` : null,
     fetcher,
     { initialData: initialArticle },
   );
 
   const articleData = fetchedArticle || initialArticle;
-  if (!articleData) return <div>데이터 없음</div>;
 
   return (
     <div className="article-page">
@@ -74,7 +71,6 @@ function ArticlePage({ initialArticle }: { initialArticle: ArticleResponse }) {
         <ArticleBody article={articleData.article} />
 
         <hr />
-        <div className="article-actions" />
 
         <CommentsSection />
       </div>
@@ -83,11 +79,18 @@ function ArticlePage({ initialArticle }: { initialArticle: ArticleResponse }) {
 }
 
 export async function getServerSideProps({ query }) {
-  const { slug } = query;
-  const {
-    data: { article },
-  } = await ArticleAPI.get(slug);
-  return { props: { article } };
+  const { id } = query;
+  try {
+    const {
+      data: { article },
+    } = await ArticleAPI.get(id);
+    return { props: { initialArticle: { article } } };
+  } catch (error) {
+    console.error('Article fetch error:', error);
+    return {
+      notFound: true,
+    };
+  }
 }
 
 export default ArticlePage;

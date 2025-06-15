@@ -8,18 +8,16 @@ import ErrorMessage from '../../shared/components/ErrorMessage';
 import LoadingSpinner from '../../shared/components/LoadingSpinner';
 
 import { CommentType } from '../../lib/types/commentType';
-import { SERVER_BASE_URL } from '../../lib/utils/constant';
-import fetcher from '../../lib/utils/fetcher';
+import CommentAPI from '../../lib/api/comment';
 
 const CommentList = () => {
   const router = useRouter();
   const {
-    query: { slug },
+    query: { id },
   } = router;
 
-  const { data, error } = useSWR(
-    `${SERVER_BASE_URL}/articles/${slug}/comments`,
-    fetcher,
+  const { data, error } = useSWR(id ? ['comments', id] : null, () =>
+    CommentAPI.forArticle(String(id)),
   );
 
   if (!data) {
@@ -31,7 +29,7 @@ const CommentList = () => {
       <ErrorMessage message="Cannot load comments related to this article..." />
     );
 
-  const { comments } = data;
+  const comments = data?.data?.comments || [];
 
   return (
     <div>

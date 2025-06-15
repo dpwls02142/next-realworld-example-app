@@ -1,23 +1,23 @@
-export interface ArticleFields {
+export type ArticleFields = {
   title: string;
-  description: string;
-  body: string;
-}
+  summary: string;
+  content: string;
+};
 
 function validateArticle(article: ArticleFields): string | null {
   const missingFields: string[] = [];
 
   const title = article.title.trim();
-  const description = article.description.trim();
-  const body = article.body.trim();
+  const summary = article.summary.trim();
+  const content = article.content.trim();
 
   if (!title) {
     missingFields.push('제목');
   }
-  if (!description) {
+  if (!summary) {
     missingFields.push('설명');
   }
-  if (!body) {
+  if (!content) {
     missingFields.push('본문');
   }
   if (missingFields.length > 0) {

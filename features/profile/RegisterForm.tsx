@@ -1,5 +1,5 @@
-import { useRouter } from 'next/router';
 import { useState } from 'react';
+import { useRouter } from 'next/router';
 import { mutate } from 'swr';
 import ListErrors from '../../shared/components/ListErrors';
 import UserAPI from '../../lib/api/user';
@@ -30,25 +30,25 @@ const RegisterForm = () => {
     setErrors([]);
 
     try {
-      const { data, status } = await UserAPI.register(
+      const { data } = await UserAPI.register(
         formData.username,
         formData.email,
         formData.password,
       );
 
-      if (status !== 200 && data?.errors) {
-        setErrors(data.errors);
-        return;
-      }
-
       if (data?.user) {
-        localStorage.setItem('user', JSON.stringify(data.user));
         mutate('user', data.user);
         router.push('/');
       }
     } catch (error) {
       console.error('Registration failed:', error);
-      setErrors(['An error occurred while signing up.']);
+      if (error.code === 'DUPLICATE_USERNAME') {
+        setErrors([error.message]);
+      } else if (error.message) {
+        setErrors([error.message]);
+      } else {
+        setErrors(['회원가입 중 오류가 발생했습니다.']);
+      }
     } finally {
       setLoading(false);
     }
@@ -121,7 +121,7 @@ const RegisterForm = () => {
             type="submit"
             disabled={isLoading}
           >
-            {isLoading ? 'Signing up...' : 'Sign up'}
+            Sign up
           </button>
         </fieldset>
       </form>

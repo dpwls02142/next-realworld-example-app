@@ -1,33 +1,25 @@
-import { useRouter } from 'next/router';
 import { useState } from 'react';
-import useSWR from 'swr';
 import Router from 'next/router';
 
 import ArticleAPI from '../../lib/api/article';
-import storage from '../../lib/utils/storage';
 import EditorForm, { ArticleInput } from '../../features/editor/EditorForm';
 
 function EditArticlePage({ article }) {
   const [errors, setErrors] = useState([]);
   const [isLoading, setLoading] = useState(false);
-  const { data: currentUser } = useSWR('user', storage);
-  const { query } = useRouter();
 
   const handleSubmit = async (editData: ArticleInput) => {
     setLoading(true);
 
     try {
-      const response = await ArticleAPI.update(
-        { ...article, ...editData, slug: query.slug as string },
-        currentUser?.token,
-      );
+      const response = await ArticleAPI.update(editData, article.id.toString());
 
       if (response.status === 200 || response.status === 201) {
         Router.push('/');
         return;
       }
     } catch (error) {
-      if (error.code === 'DUPLICATE_ARTICLE') {
+      if (error.code === 'DUPLICATE_TITLE') {
         setErrors([error.message]);
       } else {
         setErrors(['아티클 수정에 실패했습니다.']);

@@ -28,21 +28,24 @@ const LoginForm = () => {
     setLoading(true);
 
     try {
-      const { data, status } = await UserAPI.login(
+      const { data } = await UserAPI.login(
         formData.email,
         formData.password,
       );
-      if (status !== 200) {
-        setErrors(data.errors);
-      }
 
       if (data?.user) {
-        window.localStorage.setItem('user', JSON.stringify(data.user));
         mutate('user', data?.user);
         Router.push('/');
+      } else {
+        setErrors(['로그인 정보가 올바르지 않습니다.']);
       }
     } catch (error) {
-      console.error(error);
+      console.error('Login failed:', error);
+      if (error.message) {
+        setErrors([error.message]);
+      } else {
+        setErrors(['로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.']);
+      }
     } finally {
       setLoading(false);
     }

@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 const TagInput = ({ tagList, addTag, removeTag }) => {
   const [tag, setTag] = useState('');
+  const tags = tagList || [];
 
   const changeTagInput = (e) => setTag(e.target.value);
 
@@ -20,7 +21,7 @@ const TagInput = ({ tagList, addTag, removeTag }) => {
 
   const handleAddTag = () => {
     const trimmedTag = tag.trim();
-    const isDuplicate = tagList.includes(trimmedTag);
+    const isDuplicate = tags.includes(trimmedTag);
     if (trimmedTag && !isDuplicate) {
       addTag(trimmedTag);
       setTag('');
@@ -66,7 +67,7 @@ const TagInput = ({ tagList, addTag, removeTag }) => {
         </div>
 
         <div className="tag-list" style={{ marginTop: '10px' }}>
-          {tagList.map((tagItem, index) => (
+          {tags.map((tagItem, index) => (
             <span className="tag-default tag-pill" key={index}>
               {tagItem}
               <i

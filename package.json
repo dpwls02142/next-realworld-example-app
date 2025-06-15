@@ -4,10 +4,12 @@
   "author": "reck1ess",
   "scripts": {
     "dev": "next dev -p 4000",
-    "build": "next build",
+    "build": "NODE_OPTIONS=--openssl-legacy-provider next build",
     "start": "next start -p 4000"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.6.1",
+    "@supabase/supabase-js": "^2.50.0",
     "axios": "^0.19.2",
     "lazysizes": "^5.2.2",
     "marked": "^1.1.1",
@@ -26,7 +28,7 @@
     "quill": "^2.0.3",
     "react-quill": "^2.0.0",
     "turndown": "^7.2.0",
-    "typescript": "^3.9.7"
+    "typescript": "^4.9.5"
   },
   "volta": {
     "node": "14.21.3"

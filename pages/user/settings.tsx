@@ -4,10 +4,11 @@ import useSWR, { mutate, trigger } from 'swr';
 
 import SettingsForm from '../../features/profile/SettingsForm';
 import checkLogin from '../../lib/utils/checkLogin';
-import storage from '../../lib/utils/storage';
+import { getCurrentUser } from '../../lib/utils/supabase/client';
+import UserAPI from '../../lib/api/user';
 
 function Settings({ res }) {
-  const { data: currentUser } = useSWR('user', storage);
+  const { data: currentUser } = useSWR('user', getCurrentUser);
   const isLoggedIn = checkLogin(currentUser);
 
   if (!isLoggedIn) {
@@ -22,10 +23,14 @@ function Settings({ res }) {
 
   async function handleLogout(e: MouseEvent) {
     e.preventDefault();
-    window.localStorage.removeItem('user');
-    mutate('user', null);
-    await Router.push('/');
-    trigger('user');
+    try {
+      await UserAPI.logout();
+      mutate('user', null);
+      await Router.push('/');
+      trigger('user');
+    } catch (error) {
+      console.error('로그아웃 실패:', error);
+    }
   }
 
   return (

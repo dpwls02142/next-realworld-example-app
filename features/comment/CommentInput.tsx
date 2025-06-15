@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { useRouter } from 'next/router';
 import React from 'react';
 import useSWR, { trigger } from 'swr';
@@ -6,15 +5,15 @@ import useSWR, { trigger } from 'swr';
 import CustomImage from '../../shared/components/CustomImage';
 import CustomLink from '../../shared/components/CustomLink';
 import checkLogin from '../../lib/utils/checkLogin';
-import { SERVER_BASE_URL } from '../../lib/utils/constant';
-import storage from '../../lib/utils/storage';
+import { getCurrentUser } from '../../lib/utils/supabase/client';
+import CommentAPI from '../../lib/api/comment';
 
 const CommentInput = () => {
-  const { data: currentUser } = useSWR('user', storage);
+  const { data: currentUser } = useSWR('user', getCurrentUser);
   const isLoggedIn = checkLogin(currentUser);
   const router = useRouter();
   const {
-    query: { slug },
+    query: { id },
   } = router;
 
   const [content, setContent] = React.useState('');
@@ -27,23 +26,15 @@ const CommentInput = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    await axios.post(
-      `${SERVER_BASE_URL}/articles/${encodeURIComponent(String(slug))}/comments`,
-      JSON.stringify({
-        comment: {
-          body: content,
-        },
-      }),
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Token ${encodeURIComponent(currentUser?.token)}`,
-        },
-      },
-    );
-    setLoading(false);
-    setContent('');
-    trigger(`${SERVER_BASE_URL}/articles/${slug}/comments`);
+    try {
+      await CommentAPI.create(String(id), content);
+      setContent('');
+      trigger(['comments', id]);
+    } catch (error) {
+      console.error('댓글 작성 실패:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!isLoggedIn) {
@@ -65,9 +56,9 @@ const CommentInput = () => {
     <form className="card comment-form" onSubmit={handleSubmit}>
       <div className="card-block">
         <textarea
-          rows={3}
           className="form-control"
           placeholder="Write a comment..."
+          rows={3}
           value={content}
           onChange={handleChange}
           disabled={isLoading}
@@ -75,11 +66,15 @@ const CommentInput = () => {
       </div>
       <div className="card-footer">
         <CustomImage
-          className="comment-author-img"
-          src={currentUser?.image}
+          src={currentUser?.user_metadata?.image}
           alt="Comment author's profile image"
+          className="comment-author-img"
         />
-        <button className="btn btn-sm btn-primary" type="submit">
+        <button
+          className="btn btn-sm btn-primary"
+          type="submit"
+          disabled={isLoading}
+        >
           Post Comment
         </button>
       </div>

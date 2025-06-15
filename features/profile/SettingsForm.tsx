@@ -1,11 +1,10 @@
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import useSWR, { mutate } from 'swr';
-import axios from 'axios';
 import ListErrors from '../../shared/components/ListErrors';
 import checkLogin from '../../lib/utils/checkLogin';
-import { SERVER_BASE_URL } from '../../lib/utils/constant';
-import storage from '../../lib/utils/storage';
+import { getCurrentUser } from '../../lib/utils/supabase/client';
+import UserAPI from '../../lib/api/user';
 
 type UserSettingsData = {
   image: string;
@@ -17,7 +16,7 @@ type UserSettingsData = {
 
 const SettingsForm = () => {
   const router = useRouter();
-  const { data: currentUser } = useSWR('user', storage);
+  const { data: currentUser } = useSWR('user', getCurrentUser);
   const isLoggedIn = checkLogin(currentUser);
 
   const [isLoading, setLoading] = useState(false);
@@ -33,7 +32,14 @@ const SettingsForm = () => {
 
   useEffect(() => {
     if (isLoggedIn && currentUser) {
-      setUserInfo((prev) => ({ ...prev, ...currentUser, password: '' }));
+      setUserInfo((prev) => ({
+        ...prev,
+        email: currentUser.email || '',
+        username: currentUser.user_metadata?.username || '',
+        bio: currentUser.user_metadata?.bio || '',
+        image: currentUser.user_metadata?.image || '',
+        password: '',
+      }));
     }
   }, [isLoggedIn, currentUser]);
 
@@ -53,25 +59,34 @@ const SettingsForm = () => {
         delete userPayload.password;
       }
 
-      const { data, status } = await axios.put(
-        `${SERVER_BASE_URL}/user`,
-        { user: userPayload },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Token ${currentUser?.token}`,
-          },
-        },
-      );
+      console.log('Submitting user data:', {
+        username: userPayload.username,
+        currentUsername: currentUser?.user_metadata?.username,
+        userId: currentUser?.id,
+      });
+
+      const { data } = await UserAPI.save(userPayload);
 
       if (data?.user) {
-        localStorage.setItem('user', JSON.stringify(data.user));
         mutate('user', data.user);
         router.push('/');
       }
     } catch (error) {
       console.error('Settings update failed:', error);
-      setErrors(['설정 업데이트 중 오류가 발생했습니다.']);
+      console.error('Error details:', {
+        code: error.code,
+        message: error.message,
+        constraint: error.constraint,
+        status: error.status,
+      });
+
+      if (error.code === 'DUPLICATE_USERNAME') {
+        setErrors([error.message]);
+      } else if (error.code === 'DUPLICATE_DATA') {
+        setErrors([error.message]);
+      } else {
+        setErrors([error.message || '설정 업데이트에 실패했습니다.']);
+      }
     } finally {
       setLoading(false);
     }

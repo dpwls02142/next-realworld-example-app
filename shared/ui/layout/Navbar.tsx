@@ -6,11 +6,11 @@ import Maybe from '../../components/Maybe';
 import NavLink from './NavLink';
 import { usePageDispatch } from '../../../lib/context/PageContext';
 import checkLogin from '../../../lib/utils/checkLogin';
-import storage from '../../../lib/utils/storage';
+import { getCurrentUser } from '../../../lib/utils/supabase/client';
 
 const Navbar = () => {
   const setPage = usePageDispatch();
-  const { data: currentUser } = useSWR('user', storage);
+  const { data: currentUser } = useSWR('user', getCurrentUser);
   const isLoggedIn = checkLogin(currentUser);
 
   const handleClick = useCallback(() => setPage(0), []);
