@@ -112,27 +112,3 @@ export const upsertUserProfile = async (profile: {
     throw error;
   }
 };
-
-export const getArticles = async (offset = 0, limit = 10) => {
-  const serverClient = createClient();
-  const { data, error } = await serverClient
-    .from('articles')
-    .select('*')
-    .range(offset, offset + limit - 1)
-    .order('created_at', { ascending: false });
-
-  if (error) throw error;
-  return data;
-};
-
-// 서버에서 태그 가져오기
-export const getTags = async () => {
-  const serverClient = createClient();
-  const { data, error } = await serverClient
-    .from('tags')
-    .select('*')
-    .order('name');
-
-  if (error) throw error;
-  return data;
-};
