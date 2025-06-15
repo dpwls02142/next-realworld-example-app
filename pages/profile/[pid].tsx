@@ -11,50 +11,51 @@ import FollowUserButton from '../../features/profile/FollowUserButton';
 import ProfileTab from '../../features/profile/ProfileTab';
 import UserAPI from '../../lib/api/user';
 import checkLogin from '../../lib/utils/checkLogin';
-import { SERVER_BASE_URL } from '../../lib/utils/constant';
-import fetcher from '../../lib/utils/fetcher';
-import storage from '../../lib/utils/storage';
+import { getCurrentUser } from '../../lib/utils/supabase/client';
 
 function Profile({ initialProfile }) {
   const router = useRouter();
   const {
     query: { pid },
   } = router;
-  const encodedUsername = encodeURIComponent(String(pid));
+  const decodedUsername = decodeURIComponent(String(pid));
 
   const { data: fetchedProfile, error: profileError } = useSWR(
-    `${SERVER_BASE_URL}/profiles/${encodedUsername}`,
-    fetcher,
+    ['profile', decodedUsername],
+    () => UserAPI.get(decodedUsername),
     { initialData: initialProfile },
   );
 
   if (profileError) return <ErrorMessage message="Can't load profile" />;
 
-  const { profile } = fetchedProfile || initialProfile;
+  const profile =
+    fetchedProfile?.data?.profile || initialProfile?.data?.profile;
+
   const { username, bio, image, following } = profile;
 
-  const { data: currentUser } = useSWR('user', storage);
+  const { data: currentUser } = useSWR('user', getCurrentUser);
   const isLoggedIn = checkLogin(currentUser);
-  const isUser = currentUser && username === currentUser?.username;
+  const isUser =
+    currentUser && username === currentUser?.user_metadata?.username;
 
   async function handleFollow() {
     mutate(
-      `${SERVER_BASE_URL}/profiles/${encodedUsername}`,
-      { profile: { ...profile, following: true } },
+      ['profile', decodedUsername],
+      { data: { profile: { ...profile, following: true } } },
       false,
     );
-    await UserAPI.follow(pid as string);
-    trigger(`${SERVER_BASE_URL}/profiles/${encodedUsername}`);
+    await UserAPI.follow(decodedUsername);
+    trigger(['profile', decodedUsername]);
   }
 
   async function handleUnfollow() {
     mutate(
-      `${SERVER_BASE_URL}/profiles/${encodedUsername}`,
-      { profile: { ...profile, following: false } },
+      ['profile', decodedUsername],
+      { data: { profile: { ...profile, following: false } } },
       false,
     );
-    await UserAPI.unfollow(pid as string);
-    trigger(`${SERVER_BASE_URL}/profiles/${encodedUsername}`);
+    await UserAPI.unfollow(decodedUsername);
+    trigger(['profile', decodedUsername]);
   }
 
   return (
@@ -99,9 +100,29 @@ function Profile({ initialProfile }) {
   );
 }
 
-Profile.getInitialProps = async ({ query: { pid } }) => {
-  const { data: initialProfile } = await UserAPI.get(pid);
-  return { initialProfile };
-};
+export async function getServerSideProps({ query }) {
+  const { pid } = query;
+  try {
+    const decodedUsername = decodeURIComponent(String(pid));
+    console.log('Fetching profile for username:', decodedUsername);
+
+    const result = await UserAPI.get(decodedUsername);
+    console.log('Profile fetch result:', result);
+
+    return { props: { initialProfile: result } };
+  } catch (error) {
+    console.error('Profile fetch error:', error);
+    // 오류가 발생해도 빈 프로필로 페이지를 렌더링하도록 함
+    return {
+      props: {
+        initialProfile: {
+          data: {
+            profile: null,
+          },
+        },
+      },
+    };
+  }
+}
 
 export default Profile;
