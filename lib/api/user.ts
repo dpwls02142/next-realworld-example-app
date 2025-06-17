@@ -297,7 +297,8 @@ const UserAPI = {
       }
 
       let following = false;
-      if (currentUser) {
+      // 자기 자신의 프로필이 아닌 경우에만 팔로우 상태 확인
+      if (currentUser && currentUser.id !== profile.user_id) {
         following = await checkFollowStatus(currentUser.id, profile.user_id);
       }
 
