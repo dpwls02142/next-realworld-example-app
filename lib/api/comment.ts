@@ -45,7 +45,7 @@ const CommentAPI = {
     }
   },
 
-  delete: async (slug: string, commentId: string) => {
+  delete: async (commentId: string) => {
     try {
       const user = await getCurrentUser();
       if (!user) throw new Error('인증되지 않은 사용자입니다.');
@@ -99,14 +99,18 @@ const CommentAPI = {
           let following = false;
 
           if (currentUser && comment.author_id !== currentUser.id) {
-            const { data: followData } = await supabase
-              .from('user_followers')
-              .select('id')
-              .eq('from_user_id', currentUser.id)
-              .eq('to_user_id', comment.author_id)
-              .single();
+            try {
+              const { data: followData } = await supabase
+                .from('user_followers')
+                .select('id')
+                .eq('from_user_id', currentUser.id)
+                .eq('to_user_id', comment.author_id)
+                .single();
 
-            following = !!followData;
+              following = !!followData;
+            } catch (error) {
+              following = false;
+            }
           }
 
           return {
@@ -135,7 +139,7 @@ const CommentAPI = {
     }
   },
 
-  update: async (slug: string, commentId: string, commentBody: string) => {
+  update: async (commentId: string, commentBody: string) => {
     try {
       const user = await getCurrentUser();
       if (!user) throw new Error('인증되지 않은 사용자입니다.');
