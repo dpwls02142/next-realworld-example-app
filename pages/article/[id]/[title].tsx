@@ -1,11 +1,7 @@
-import { useRouter } from 'next/router';
-import useSWR from 'swr';
 import ArticleMeta from '../../../features/article/ArticleMeta';
 import CommentList from '../../../features/comment/CommentList';
 import ArticleAPI from '../../../lib/api/article';
 import { ArticleType, ArticleResponse } from '../../../lib/types/articleType';
-import { SERVER_BASE_URL } from '../../../lib/utils/constant';
-import fetcher from '../../../lib/utils/fetcher';
 
 function ArticleBanner({ article }: { article: ArticleType }) {
   return (
@@ -50,25 +46,12 @@ function CommentsSection() {
 }
 
 function ArticlePage({ initialArticle }: { initialArticle: ArticleResponse }) {
-  const router = useRouter();
-  const {
-    query: { id },
-  } = router;
-
-  const { data: fetchedArticle } = useSWR(
-    id ? `${SERVER_BASE_URL}/articles/${id}` : null,
-    fetcher,
-    { initialData: initialArticle },
-  );
-
-  const articleData = fetchedArticle || initialArticle;
-
   return (
     <div className="article-page">
-      <ArticleBanner article={articleData.article} />
+      <ArticleBanner article={initialArticle.article} />
 
       <div className="container page">
-        <ArticleBody article={articleData.article} />
+        <ArticleBody article={initialArticle.article} />
 
         <hr />
 

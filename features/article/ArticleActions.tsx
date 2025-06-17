@@ -5,7 +5,6 @@ import useSWR, { trigger } from 'swr';
 import CustomLink from '../../shared/components/CustomLink';
 import checkLogin from '../../lib/utils/checkLogin';
 import ArticleAPI from '../../lib/api/article';
-import { SERVER_BASE_URL } from '../../lib/utils/constant';
 import { getCurrentUser } from '../../lib/utils/supabase/client';
 import Maybe from '../../shared/components/Maybe';
 
@@ -28,8 +27,6 @@ const ArticleActions = ({ article }) => {
 
     try {
       await ArticleAPI.delete(id as string);
-
-      trigger(`${SERVER_BASE_URL}/articles/${id}`);
 
       const cacheKeys = [
         ['articles', 'all', 0],

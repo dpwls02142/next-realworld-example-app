@@ -99,14 +99,18 @@ const CommentAPI = {
           let following = false;
 
           if (currentUser && comment.author_id !== currentUser.id) {
-            const { data: followData } = await supabase
-              .from('user_followers')
-              .select('id')
-              .eq('from_user_id', currentUser.id)
-              .eq('to_user_id', comment.author_id)
-              .single();
+            try {
+              const { data: followData } = await supabase
+                .from('user_followers')
+                .select('id')
+                .eq('from_user_id', currentUser.id)
+                .eq('to_user_id', comment.author_id)
+                .single();
 
-            following = !!followData;
+              following = !!followData;
+            } catch (error) {
+              following = false;
+            }
           }
 
           return {

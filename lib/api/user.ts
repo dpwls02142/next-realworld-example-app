@@ -17,14 +17,19 @@ const checkFollowStatus = async (
   currentUserId: string,
   targetUserId: string,
 ) => {
-  const { data: followData } = await supabase
-    .from('user_followers')
-    .select('id')
-    .eq('from_user_id', currentUserId)
-    .eq('to_user_id', targetUserId)
-    .single();
+  try {
+    const { data: followData } = await supabase
+      .from('user_followers')
+      .select('id')
+      .eq('from_user_id', currentUserId)
+      .eq('to_user_id', targetUserId)
+      .single();
 
-  return !!followData;
+    return !!followData;
+  } catch (error) {
+    console.warn('팔로우 상태 확인 실패:', error);
+    return false;
+  }
 };
 
 const UserAPI = {
@@ -217,9 +222,11 @@ const UserAPI = {
 
       if (error) {
         if (error.code === '23505') {
-          throw new Error('이미 팔로우한 사용자입니다.');
+          console.warn('이미 팔로우한 사용자입니다.');
+        } else {
+          console.warn('팔로우 실패:', error);
+          throw new Error('팔로우에 실패했습니다.');
         }
-        throw error;
       }
 
       return {
@@ -256,7 +263,10 @@ const UserAPI = {
         .eq('from_user_id', user.id)
         .eq('to_user_id', targetProfile.user_id);
 
-      if (error) throw error;
+      if (error) {
+        console.warn('언팔로우 실패:', error);
+        throw new Error('언팔로우에 실패했습니다.');
+      }
 
       return {
         data: {
@@ -287,7 +297,8 @@ const UserAPI = {
       }
 
       let following = false;
-      if (currentUser) {
+      // 자기 자신의 프로필이 아닌 경우에만 팔로우 상태 확인
+      if (currentUser && currentUser.id !== profile.user_id) {
         following = await checkFollowStatus(currentUser.id, profile.user_id);
       }
 

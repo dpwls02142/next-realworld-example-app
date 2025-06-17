@@ -10,7 +10,7 @@ const TabList = () => {
   const isLoggedIn = checkLogin(currentUser);
   const router = useRouter();
   const {
-    query: { tag },
+    query: { tag, follow },
   } = router;
 
   const tagTab = tag && (
@@ -29,16 +29,24 @@ const TabList = () => {
     <ul className="nav nav-pills outline-active">
       {isLoggedIn && (
         <li className="nav-item">
-          <NavLink href="/?follow=true" as="/?follow=true">
-            Follow Feed
-          </NavLink>
+          <CustomLink
+            href={`/?follow=${currentUser?.username}`}
+            as={`/?follow=${currentUser?.username}`}
+            className={`nav-link ${follow ? 'active' : ''}`}
+          >
+            Your Feed
+          </CustomLink>
         </li>
       )}
 
       <li className="nav-item">
-        <NavLink href="/" as="/">
+        <CustomLink
+          href="/"
+          as="/"
+          className={`nav-link ${!follow && !tag ? 'active' : ''}`}
+        >
           Global Feed
-        </NavLink>
+        </CustomLink>
       </li>
 
       {tagTab}

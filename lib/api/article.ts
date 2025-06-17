@@ -31,12 +31,6 @@ type ApiResponse<T = any> = {
   status: number;
 };
 
-type ApiError = {
-  message: string;
-  code: string;
-  status?: number;
-};
-
 const throttle = (() => {
   let lastRequest: Promise<any> | null = null;
   let lastTime = 0;
@@ -83,13 +77,24 @@ const getFavoriteMeta = async (articleId: number, userId?: string) => {
 };
 
 const getFollowStatus = async (currentUserId: string, authorId: string) => {
-  const { data } = await supabase
-    .from('user_followers')
-    .select('id')
-    .eq('from_user_id', currentUserId)
-    .eq('to_user_id', authorId)
-    .single();
-  return !!data;
+  try {
+    const { data, error } = await supabase
+      .from('user_followers')
+      .select('id')
+      .eq('from_user_id', currentUserId)
+      .eq('to_user_id', authorId)
+      .maybeSingle();
+
+    if (error) {
+      console.warn('팔로우 상태 확인 실패:', error);
+      return false;
+    }
+
+    return !!data;
+  } catch (error) {
+    console.warn('팔로우 상태 확인 실패:', error);
+    return false;
+  }
 };
 
 const enrichArticles = async (articles: any[], currentUserId?: string) => {
@@ -257,22 +262,19 @@ const ArticleAPI = {
     const user = await getCurrentUser();
     if (!user) throw new Error('인증되지 않은 사용자입니다.');
 
-    const { data: follows } = await supabase
-      .from('user_followers')
-      .select('to_user_id')
-      .eq('from_user_id', user.id);
+    try {
+      // 현재 사용자 자신의 글들을 가져옴
+      const query = supabase
+        .from('articles')
+        .select(ARTICLE_SELECT, { count: 'exact' })
+        .eq('author_id', user.id);
 
-    const followedIds = follows?.map((f) => f.to_user_id) || [];
-    if (!followedIds.length)
+      const result = await fetchArticles(query, page, limit, user.id);
+      return { data: result, status: 200 };
+    } catch (error) {
+      console.warn('피드 조회 실패:', error);
       return { data: { articles: [], articlesCount: 0 }, status: 200 };
-
-    const query = supabase
-      .from('articles')
-      .select(ARTICLE_SELECT, { count: 'exact' })
-      .in('author_id', followedIds);
-
-    const result = await fetchArticles(query, page, limit, user.id);
-    return { data: result, status: 200 };
+    }
   },
 
   get: async (slug: string): Promise<ApiResponse<ArticleResponse>> => {
