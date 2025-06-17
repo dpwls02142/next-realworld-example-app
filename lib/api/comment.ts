@@ -45,7 +45,7 @@ const CommentAPI = {
     }
   },
 
-  delete: async (commentId: string) => {
+  delete: async (slug: string, commentId: string) => {
     try {
       const user = await getCurrentUser();
       if (!user) throw new Error('인증되지 않은 사용자입니다.');
@@ -139,7 +139,7 @@ const CommentAPI = {
     }
   },
 
-  update: async (commentId: string, commentBody: string) => {
+  update: async (slug: string, commentId: string, commentBody: string) => {
     try {
       const user = await getCurrentUser();
       if (!user) throw new Error('인증되지 않은 사용자입니다.');
