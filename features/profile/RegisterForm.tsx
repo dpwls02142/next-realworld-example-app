@@ -20,8 +20,12 @@ const RegisterForm = () => {
     password: '',
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [isPasswordValid, setIsPasswordValid] = useState(true);
   const handleInputChange = (field: keyof RegisterFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    if (field === 'password') {
+      setIsPasswordValid(value.length === 0 || value.length >= 6);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -113,6 +117,17 @@ const RegisterForm = () => {
                   color: '#999',
                 }}
               />
+              {!isPasswordValid && (
+                <div
+                  style={{
+                    color: 'red',
+                    fontSize: '0.875rem',
+                    marginTop: '0.25rem',
+                  }}
+                >
+                  비밀번호는 최소 6자 이상이어야 합니다.
+                </div>
+              )}
             </div>
           </div>
 

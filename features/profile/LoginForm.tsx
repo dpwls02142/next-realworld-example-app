@@ -18,9 +18,13 @@ const LoginForm = () => {
     password: '',
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [isPasswordValid, setIsPasswordValid] = useState(true);
 
   const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    if (field === 'password') {
+      setIsPasswordValid(value.length === 0 || value.length >= 6);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -28,10 +32,7 @@ const LoginForm = () => {
     setLoading(true);
 
     try {
-      const { data } = await UserAPI.login(
-        formData.email,
-        formData.password,
-      );
+      const { data } = await UserAPI.login(formData.email, formData.password);
 
       if (data?.user) {
         mutate('user', data?.user);
@@ -97,6 +98,17 @@ const LoginForm = () => {
                   color: '#999',
                 }}
               />
+              {!isPasswordValid && (
+                <div
+                  style={{
+                    color: 'red',
+                    fontSize: '0.875rem',
+                    marginTop: '0.25rem',
+                  }}
+                >
+                  비밀번호는 최소 6자 이상이어야 합니다.
+                </div>
+              )}
             </div>
           </fieldset>
 

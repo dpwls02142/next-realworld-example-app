@@ -18,10 +18,10 @@ const SettingsForm = () => {
   const router = useRouter();
   const { data: currentUser } = useSWR('user', getCurrentUser);
   const isLoggedIn = checkLogin(currentUser);
-
   const [isLoading, setLoading] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const [showPassword, setShowPassword] = useState(false);
+  const [isPasswordValid, setIsPasswordValid] = useState(true);
   const [userInfo, setUserInfo] = useState<UserSettingsData>({
     image: '',
     username: '',
@@ -45,6 +45,9 @@ const SettingsForm = () => {
 
   const handleInputChange = (field: keyof UserSettingsData, value: string) => {
     setUserInfo((prev) => ({ ...prev, [field]: value }));
+    if (field === 'password') {
+      setIsPasswordValid(value.length === 0 || value.length >= 6);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -174,6 +177,17 @@ const SettingsForm = () => {
                   color: '#999',
                 }}
               />
+              {!isPasswordValid && (
+                <div
+                  style={{
+                    color: 'red',
+                    fontSize: '0.875rem',
+                    marginTop: '0.25rem',
+                  }}
+                >
+                  비밀번호는 최소 6자 이상이어야 합니다.
+                </div>
+              )}
             </div>
           </fieldset>
 
