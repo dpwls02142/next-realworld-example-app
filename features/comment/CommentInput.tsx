@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import React from 'react';
+import { useCallback, useState } from 'react';
 import useSWR, { trigger } from 'swr';
 
 import CustomImage from '../../shared/components/CustomImage';
@@ -16,10 +16,10 @@ const CommentInput = () => {
     query: { id },
   } = router;
 
-  const [content, setContent] = React.useState('');
-  const [isLoading, setLoading] = React.useState(false);
+  const [content, setContent] = useState('');
+  const [isLoading, setLoading] = useState(false);
 
-  const handleChange = React.useCallback((e) => {
+  const handleChange = useCallback((e) => {
     setContent(e.target.value);
   }, []);
 
