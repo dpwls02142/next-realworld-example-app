@@ -23,35 +23,20 @@ export const getCurrentUser = async () => {
 
   if (!user) return null;
 
-  try {
-    // 사용자 프로필 정보도 함께 가져오기
-    const profile = await getUserProfile(user.id);
-    return {
-      id: user.id,
-      email: user.email,
-      user_metadata: {
-        username: profile.username,
-        bio: profile.bio,
-        image: profile.image,
-      },
+  // 사용자 프로필 정보도 함께 가져오기
+  const profile = await getUserProfile(user.id);
+  return {
+    id: user.id,
+    email: user.email,
+    user_metadata: {
       username: profile.username,
       bio: profile.bio,
       image: profile.image,
-    };
-  } catch (error) {
-    return {
-      id: user.id,
-      email: user.email,
-      user_metadata: {
-        username: user.user_metadata?.username || '',
-        bio: '',
-        image: '',
-      },
-      username: user.user_metadata?.username || '',
-      bio: '',
-      image: '',
-    };
-  }
+    },
+    username: profile.username,
+    bio: profile.bio,
+    image: profile.image,
+  };
 };
 
 export const getUserProfile = async (userId: string) => {

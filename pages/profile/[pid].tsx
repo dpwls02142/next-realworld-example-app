@@ -100,29 +100,15 @@ function Profile({ initialProfile }) {
   );
 }
 
-export async function getServerSideProps({ query }) {
+Profile.getInitialProps = async ({ query }) => {
   const { pid } = query;
   try {
     const decodedUsername = decodeURIComponent(String(pid));
-    console.log('Fetching profile for username:', decodedUsername);
-
     const result = await UserAPI.get(decodedUsername);
-    console.log('Profile fetch result:', result);
-
-    return { props: { initialProfile: result } };
+    return { initialProfile: result };
   } catch (error) {
     console.error('Profile fetch error:', error);
-    // 오류가 발생해도 빈 프로필로 페이지를 렌더링하도록 함
-    return {
-      props: {
-        initialProfile: {
-          data: {
-            profile: null,
-          },
-        },
-      },
-    };
   }
-}
+};
 
 export default Profile;
