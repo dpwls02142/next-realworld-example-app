@@ -11,6 +11,10 @@ export interface UserProfile {
 export interface User {
   id: string;
   email: string;
+  username?: string;
+  bio?: string;
+  image?: string;
+  followersCount?: number;
   user_metadata?: {
     username?: string;
   };

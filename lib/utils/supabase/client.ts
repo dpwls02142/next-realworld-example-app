@@ -25,6 +25,7 @@ export const getCurrentUser = async () => {
 
   // 사용자 프로필 정보도 함께 가져오기
   const profile = await getUserProfile(user.id);
+
   return {
     id: user.id,
     email: user.email,
