@@ -61,11 +61,7 @@ function Profile({ initialProfile }) {
               </div>
               <EditProfileButton isUser={isUser} />
               <Maybe test={isLoggedIn}>
-                <FollowUserButton
-                  isUser={isUser}
-                  username={username}
-                  following={following}
-                />
+                <FollowUserButton isUser={isUser} username={username} />
               </Maybe>
             </div>
           </div>
