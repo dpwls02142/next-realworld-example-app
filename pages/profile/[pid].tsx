@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import React from 'react';
-import useSWR, { mutate, trigger } from 'swr';
+import useSWR from 'swr';
 
 import ArticleList from '../../features/article/ArticleList';
 import CustomImage from '../../shared/components/CustomImage';
@@ -12,6 +12,7 @@ import ProfileTab from '../../features/profile/ProfileTab';
 import UserAPI from '../../lib/api/user';
 import checkLogin from '../../lib/utils/checkLogin';
 import { getCurrentUser } from '../../lib/utils/supabase/client';
+import { useFollowersCount } from '../../lib/hooks/useFollow';
 
 function Profile({ initialProfile }) {
   const router = useRouter();
@@ -31,32 +32,14 @@ function Profile({ initialProfile }) {
   const profile =
     fetchedProfile?.data?.profile || initialProfile?.data?.profile;
 
-  const { username, bio, image, following } = profile;
+  const { user_id, username, bio, image, following } = profile;
 
   const { data: currentUser } = useSWR('user', getCurrentUser);
   const isLoggedIn = checkLogin(currentUser);
   const isUser =
     currentUser && username === currentUser?.user_metadata?.username;
 
-  async function handleFollow() {
-    mutate(
-      ['profile', decodedUsername],
-      { data: { profile: { ...profile, following: true } } },
-      false,
-    );
-    await UserAPI.follow(decodedUsername);
-    trigger(['profile', decodedUsername]);
-  }
-
-  async function handleUnfollow() {
-    mutate(
-      ['profile', decodedUsername],
-      { data: { profile: { ...profile, following: false } } },
-      false,
-    );
-    await UserAPI.unfollow(decodedUsername);
-    trigger(['profile', decodedUsername]);
-  }
+  const { data: followersCount } = useFollowersCount(user_id);
 
   return (
     <div className="profile-page">
@@ -71,14 +54,17 @@ function Profile({ initialProfile }) {
               />
               <h4>{username}</h4>
               <p>{bio}</p>
+              <div className="profile-stats">
+                <span className="followers-count">
+                  팔로워 {followersCount || 0}명
+                </span>
+              </div>
               <EditProfileButton isUser={isUser} />
               <Maybe test={isLoggedIn}>
                 <FollowUserButton
                   isUser={isUser}
                   username={username}
                   following={following}
-                  follow={handleFollow}
-                  unfollow={handleUnfollow}
                 />
               </Maybe>
             </div>
