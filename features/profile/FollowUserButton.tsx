@@ -1,30 +1,34 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useFollowMutation } from '../../lib/hooks/useFollow';
+import { useQuery } from '@tanstack/react-query';
+import UserAPI from 'lib/api/user';
 
-const FollowUserButton = ({ isUser, following, username }) => {
-  const [isFollowing, setIsFollowing] = useState(following);
+type FollowUserButtonProps = {
+  isUser: boolean;
+  username: string;
+};
+
+const FollowUserButton = ({ isUser, username }: FollowUserButtonProps) => {
   const followMutation = useFollowMutation();
+
+  const { data: profile } = useQuery({
+    queryKey: ['profile', username],
+    queryFn: () => UserAPI.get(username),
+  });
 
   if (isUser) {
     return null;
   }
 
+  const isFollowing = profile?.data?.profile?.following || false;
+
   const handleClick = (e) => {
     e.preventDefault();
 
-    const currentFollowingState = isFollowing;
-    setIsFollowing(!currentFollowingState);
-    followMutation.mutate(
-      {
-        username,
-        isFollowing: currentFollowingState,
-      },
-      {
-        onError: () => {
-          setIsFollowing(currentFollowingState);
-        },
-      },
-    );
+    followMutation.mutate({
+      username,
+      isFollowing,
+    });
   };
 
   return (

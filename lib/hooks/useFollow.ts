@@ -6,6 +6,10 @@ type FollowMutationParams = {
   isFollowing: boolean;
 };
 
+type MutationContext = {
+  previousProfile: any;
+};
+
 export const useFollowersCount = (username: string) => {
   return useQuery({
     queryKey: ['followers', username],
@@ -18,23 +22,47 @@ export const useFollowersCount = (username: string) => {
 export const useFollowMutation = () => {
   const queryClient = useQueryClient();
 
-  return useMutation(
-    async ({ username, isFollowing }: FollowMutationParams) => {
+  return useMutation<any, Error, FollowMutationParams, MutationContext>({
+    mutationFn: async ({ username, isFollowing }: FollowMutationParams) => {
       if (isFollowing) {
-        return UserAPI.unfollow(username);
+        return await UserAPI.unfollow(username);
       } else {
-        return UserAPI.follow(username);
+        return await UserAPI.follow(username);
       }
     },
-    {
-      onSuccess: (data, variables) => {
-        queryClient.invalidateQueries(['followers']);
-        queryClient.invalidateQueries(['profile', variables.username]);
-        queryClient.invalidateQueries(['user']);
-      },
-      onError: (error) => {
-        console.error(error);
-      },
+    onMutate: async ({
+      username,
+      isFollowing,
+    }: FollowMutationParams): Promise<MutationContext> => {
+      await queryClient.cancelQueries({ queryKey: ['profile', username] });
+
+      const previousProfile = queryClient.getQueryData(['profile', username]);
+
+      queryClient.setQueryData(['profile', username], (old: any) => ({
+        ...old,
+        data: {
+          ...old?.data,
+          profile: {
+            ...old?.data?.profile,
+            following: !isFollowing,
+          },
+        },
+      }));
+
+      return { previousProfile };
     },
-  );
+    onError: (err, variables, context) => {
+      if (context?.previousProfile) {
+        queryClient.setQueryData(
+          ['profile', variables.username],
+          context.previousProfile,
+        );
+      }
+    },
+    onSettled: (data, error, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ['profile', variables.username],
+      });
+    },
+  });
 };
