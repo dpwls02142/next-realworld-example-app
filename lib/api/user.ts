@@ -297,7 +297,6 @@ const UserAPI = {
       }
 
       let following = false;
-      // 자기 자신의 프로필이 아닌 경우에만 팔로우 상태 확인
       if (currentUser && currentUser.id !== profile.user_id) {
         following = await checkFollowStatus(currentUser.id, profile.user_id);
       }
@@ -305,6 +304,7 @@ const UserAPI = {
       return {
         data: {
           profile: {
+            user_id: profile.user_id,
             username: profile.username,
             bio: profile.bio,
             image: profile.image,
@@ -330,6 +330,15 @@ const UserAPI = {
     } catch (error) {
       throw error;
     }
+  },
+
+  getFollowersCount: async (userId: string) => {
+    const { count } = await supabase
+      .from('user_followers')
+      .select('*', { count: 'exact', head: true })
+      .eq('to_user_id', userId);
+
+    return count || 0;
   },
 };
 

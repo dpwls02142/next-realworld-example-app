@@ -1,24 +1,31 @@
 import Router from 'next/router';
-import { MouseEvent } from 'react';
+import { MouseEvent, useEffect } from 'react';
 import useSWR, { mutate, trigger } from 'swr';
 
 import SettingsForm from '../../features/profile/SettingsForm';
 import checkLogin from '../../lib/utils/checkLogin';
 import { getCurrentUser } from '../../lib/utils/supabase/client';
+import {
+  getCurrentUser as getServerCurrentUser,
+  getUserProfile,
+} from '../../lib/utils/supabase/server';
 import UserAPI from '../../lib/api/user';
 
-function Settings({ res }) {
-  const { data: currentUser } = useSWR('user', getCurrentUser);
+function Settings({ user }) {
+  const { data: currentUser } = useSWR('user', getCurrentUser, {
+    initialData: user,
+  });
+
   const isLoggedIn = checkLogin(currentUser);
 
-  if (!isLoggedIn) {
-    if (res) {
-      res.writeHead(302, {
-        Location: '/',
-      });
-      res.end();
+  useEffect(() => {
+    if (!isLoggedIn) {
+      Router.push('/');
     }
-    Router.push(`/`);
+  }, [isLoggedIn]);
+
+  if (!isLoggedIn) {
+    return null;
   }
 
   async function handleLogout(e: MouseEvent) {
@@ -51,10 +58,53 @@ function Settings({ res }) {
   );
 }
 
-Settings.getInitialProps = async ({ res }) => {
-  return {
-    res,
-  };
-};
+export async function getServerSideProps(context) {
+  try {
+    const user = await getServerCurrentUser();
 
+    if (!user) {
+      return {
+        props: {
+          user: null,
+        },
+      };
+    }
+
+    const profile = await getUserProfile(user.id);
+
+    if (!profile) {
+      return {
+        props: {
+          user: null,
+        },
+      };
+    }
+
+    const userProps = {
+      id: user.id,
+      email: user.email,
+      user_metadata: {
+        username: profile.username,
+        bio: profile.bio,
+        image: profile.image,
+      },
+      username: profile.username,
+      bio: profile.bio,
+      image: profile.image,
+    };
+
+    return {
+      props: {
+        user: userProps,
+      },
+    };
+  } catch (error) {
+    console.error('getServerSideProps error:', error);
+    return {
+      props: {
+        user: null,
+      },
+    };
+  }
+}
 export default Settings;

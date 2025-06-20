@@ -9,7 +9,7 @@ import { usePageDispatch } from '../../lib/context/PageContext';
 import checkLogin from '../../lib/utils/checkLogin';
 import { getCurrentUser } from '../../lib/utils/supabase/client';
 import { ArticleType } from '../../lib/types/articleType';
-import ArticleAPI from '../../lib/api/article';
+import { useFavoriteMutation } from '../../lib/hooks/useFavoriteMutation';
 
 type ArticleProps = {
   article: ArticleType;
@@ -23,17 +23,19 @@ const ArticlePreview = ({ article }: ArticleProps) => {
 
   const { data: currentUser } = useSWR('user', getCurrentUser);
   const isLoggedIn = checkLogin(currentUser);
-
+  const favoriteMutation = useFavoriteMutation();
   const toggleFavorite = async () => {
     if (!isLoggedIn) {
       Router.push('/user/login');
       return;
     }
 
-    const nextFavorited = !preview.favorited;
+    const currentFavorited = preview.favorited;
+    const currentCount = preview.favorites_count || 0;
+    const nextFavorited = !currentFavorited;
     const nextFavoritesCount = nextFavorited
-      ? (preview.favorites_count || 0) + 1
-      : (preview.favorites_count || 0) - 1;
+      ? currentCount + 1
+      : currentCount - 1;
 
     setPreview({
       ...preview,
@@ -41,19 +43,21 @@ const ArticlePreview = ({ article }: ArticleProps) => {
       favorites_count: nextFavoritesCount,
     });
 
-    try {
-      if (nextFavorited) {
-        await ArticleAPI.favorite(preview.id.toString());
-      } else {
-        await ArticleAPI.unfavorite(preview.id.toString());
-      }
-    } catch {
-      setPreview({
-        ...preview,
-        favorited: !nextFavorited,
-        favorites_count: preview.favorites_count,
-      });
-    }
+    favoriteMutation.mutate(
+      {
+        articleId: preview.id.toString(),
+        isFavorited: currentFavorited,
+      },
+      {
+        onError: () => {
+          setPreview({
+            ...preview,
+            favorited: currentFavorited,
+            favorites_count: currentCount,
+          });
+        },
+      },
+    );
   };
 
   return (
@@ -75,6 +79,7 @@ const ArticlePreview = ({ article }: ArticleProps) => {
                 : 'btn btn-sm btn-outline-primary'
             }
             onClick={toggleFavorite}
+            disabled={favoriteMutation.isLoading}
           >
             <i className="ion-heart" /> {preview.favorites_count || 0}
           </button>
