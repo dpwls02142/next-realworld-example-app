@@ -15,6 +15,8 @@ import {
 import useViewport from '../../lib/hooks/useViewport';
 import { DEFAULT_LIMIT } from '../../lib/utils/constant';
 import ArticleAPI from '../../lib/api/article';
+import checkLogin from '../../lib/utils/checkLogin';
+import { getCurrentUser } from '../../lib/utils/supabase/client';
 
 const PAGINATION_THRESHOLD = 20;
 const MAX_PAGE_COUNT = 480;
@@ -36,11 +38,14 @@ const ArticleList = () => {
   const { pathname, query } = router;
   const { favorite, follow, tag, pid } = query;
 
+  const { data: currentUser } = useSWR('user', getCurrentUser);
+  const isLoggedIn = checkLogin(currentUser);
+
   const isProfilePage = pathname.startsWith('/profile');
   const isTagPage = !!tag;
   const isFavoritePage = isProfilePage && !!favorite;
   const isAuthorPage = isProfilePage && !favorite;
-  const isFeedPage = !isProfilePage && !!follow;
+  const isFeedPage = !isProfilePage && !!follow && isLoggedIn;
 
   function calculateLastIndex(totalCount: number) {
     const maxPages =
@@ -127,7 +132,7 @@ const ArticleList = () => {
     vw >= DESKTOP_BREAKPOINT ? DESKTOP_PAGE_COUNT : MOBILE_PAGE_COUNT;
 
   return (
-    <>
+    <div>
       {articles?.map((article) => (
         <ArticlePreview key={article.id} article={article} />
       ))}
@@ -142,7 +147,7 @@ const ArticleList = () => {
           fetchURL=""
         />
       </Maybe>
-    </>
+    </div>
   );
 };
 
