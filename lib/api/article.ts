@@ -23,6 +23,54 @@ const ARTICLE_SELECT = `
     tags (
       name
     )
+  ),
+  article_favorites (
+    id,
+    user_id
+  )
+`;
+
+const ARTICLE_SELECT_BY_TAG = `
+  *,
+  user_profiles!articles_author_id_fkey (username, bio, image),
+  article_tags!inner (tags!inner (name)),
+  article_favorites (
+    id,
+    user_id
+  )
+`;
+
+// 즐겨찾기별 조회용 select
+const ARTICLE_SELECT_FAVORITED = `
+  *,
+  user_profiles!articles_author_id_fkey (
+    username,
+    bio,
+    image
+  ),
+  article_tags (
+    tags (
+      name
+    )
+  ),
+  article_favorites!inner (
+    id,
+    user_id
+  )
+`;
+
+// 상세 페이지용 간단한 select (팔로우/즐겨찾기 정보 제외)
+const ARTICLE_SELECT_DETAIL = `
+  *,
+  user_profiles!articles_author_id_fkey (
+    username,
+    bio,
+    image
+  ),
+  article_tags (
+    tags (
+      name
+    )
   )
 `;
 
@@ -47,75 +95,66 @@ const throttle = (() => {
   };
 })();
 
-const getUserProfile = async (username: string) => {
+const getUserIdByUsername = async (
+  username: string,
+): Promise<string | null> => {
   const { data, error } = await supabase
     .from('user_profiles')
     .select('user_id')
     .eq('username', username)
     .single();
-  return error ? null : data;
+  return error ? null : data?.user_id;
 };
 
-const getFavoriteMeta = async (articleId: number, userId?: string) => {
-  const { count = 0 } = await supabase
-    .from('article_favorites')
-    .select('*', { count: 'exact', head: true })
-    .eq('article_id', articleId);
+const getFollowStatus = async (currentUserId: string, authorIds: string[]) => {
+  if (!currentUserId || authorIds.length === 0) return {};
 
-  let favorited = false;
-  if (userId) {
-    const { data } = await supabase
-      .from('article_favorites')
-      .select('id')
-      .eq('article_id', articleId)
-      .eq('user_id', userId)
-      .maybeSingle();
-    favorited = !!data;
-  }
+  const { data } = await supabase
+    .from('user_followers')
+    .select('to_user_id')
+    .eq('from_user_id', currentUserId)
+    .in('to_user_id', authorIds);
 
-  return { favorited, favorites_count: count };
-};
+  // authorId를 key로 하는 맵 생성
+  const followMap: Record<string, boolean> = {};
+  authorIds.forEach((id) => (followMap[id] = false));
+  data.forEach((follow) => (followMap[follow.to_user_id] = true));
 
-const getFollowStatus = async (currentUserId: string, authorId: string) => {
-  try {
-    const { data, error } = await supabase
-      .from('user_followers')
-      .select('id')
-      .eq('from_user_id', currentUserId)
-      .eq('to_user_id', authorId)
-      .maybeSingle();
-
-    if (error) {
-      console.warn('팔로우 상태 확인 실패:', error);
-      return false;
-    }
-
-    return !!data;
-  } catch (error) {
-    console.warn('팔로우 상태 확인 실패:', error);
-    return false;
-  }
+  return followMap;
 };
 
 const enrichArticles = async (articles: any[], currentUserId?: string) => {
-  return Promise.all(
-    articles.map(async (article) => {
-      const meta = await getFavoriteMeta(article.id, currentUserId);
-      const following = currentUserId
-        ? await getFollowStatus(currentUserId, article.author_id)
-        : false;
+  if (articles.length === 0) return [];
 
-      return {
-        ...article,
-        ...meta,
-        tags: article.article_tags?.map((at: any) => at.tags) || [],
-        user_profiles: {
-          ...article.user_profiles,
-          following,
-        },
-      };
-    }),
-  );
+  // 팔로우 상태를 한 번에 조회
+  const authorIds = Array.from(new Set(articles.map((a) => a.author_id)));
+  const followMap = currentUserId
+    ? await getFollowStatus(currentUserId, authorIds)
+    : {};
+
+  return articles.map((article) => {
+    // 즐겨찾기 데이터 계산 (이미 조인으로 가져온 데이터 사용)
+    const favorited = currentUserId
+      ? article.article_favorites?.some((f: any) => f.user_id === currentUserId)
+      : false;
+    const favorites_count = article.article_favorites?.length || 0;
+
+    // 팔로우 상태 설정
+    const following = currentUserId
+      ? followMap[article.author_id] || false
+      : false;
+
+    return {
+      ...article,
+      favorited,
+      favorites_count,
+      tags: article.article_tags?.map((at: any) => at.tags) || [],
+      user_profiles: {
+        ...article.user_profiles,
+        following,
+      },
+    };
+  });
 };
 
 const toArticleType = (article: any): ArticleType => ({
@@ -151,6 +190,7 @@ const fetchArticles = async (
   } = await query
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1);
+
   if (error) throw error;
 
   const enriched = await enrichArticles(data, userId);
@@ -197,13 +237,13 @@ const ArticleAPI = {
     limit = 5,
   ): Promise<ApiResponse<ArticleListResponse>> => {
     const user = await getCurrentUser();
-    const profile = await getUserProfile(author);
+    const profile = await getUserIdByUsername(author);
     if (!profile)
       return { data: { articles: [], articlesCount: 0 }, status: 200 };
     const query = supabase
       .from('articles')
       .select(ARTICLE_SELECT, { count: 'exact' })
-      .eq('author_id', profile.user_id);
+      .eq('author_id', profile);
     const result = await fetchArticles(query, page, limit, user?.id);
     return { data: result, status: 200 };
   },
@@ -216,14 +256,7 @@ const ArticleAPI = {
     const user = await getCurrentUser();
     const query = supabase
       .from('articles')
-      .select(
-        `
-        *,
-        user_profiles!articles_author_id_fkey (username, bio, image),
-        article_tags!inner (tags!inner (name))
-      `,
-        { count: 'exact' },
-      )
+      .select(ARTICLE_SELECT_BY_TAG, { count: 'exact' })
       .eq('article_tags.tags.name', tag);
 
     const result = await fetchArticles(query, page, limit, user?.id);
@@ -235,16 +268,14 @@ const ArticleAPI = {
     page: number,
   ): Promise<ApiResponse<ArticleListResponse>> => {
     const user = await getCurrentUser();
-    const profile = await getUserProfile(author);
+    const profile = await getUserIdByUsername(author);
     if (!profile)
       return { data: { articles: [], articlesCount: 0 }, status: 200 };
 
     const query = supabase
       .from('articles')
-      .select(`${ARTICLE_SELECT}, article_favorites!inner (user_id)`, {
-        count: 'exact',
-      })
-      .eq('article_favorites.user_id', profile.user_id);
+      .select(ARTICLE_SELECT_FAVORITED, { count: 'exact' })
+      .eq('article_favorites.user_id', profile);
 
     const result = await fetchArticles(
       query,
@@ -263,7 +294,6 @@ const ArticleAPI = {
     if (!user) throw new Error('인증되지 않은 사용자입니다.');
 
     try {
-      // 현재 사용자 자신의 글들을 가져옴
       const query = supabase
         .from('articles')
         .select(ARTICLE_SELECT, { count: 'exact' })
@@ -278,17 +308,28 @@ const ArticleAPI = {
   },
 
   get: async (slug: string): Promise<ApiResponse<ArticleResponse>> => {
-    const user = await getCurrentUser();
     const articleId = Number(slug);
     const { data, error } = await supabase
       .from('articles')
-      .select(ARTICLE_SELECT)
+      .select(ARTICLE_SELECT_DETAIL)
       .eq('id', articleId)
       .single();
-    if (error || !data) throw new Error('게시글을 찾을 수 없습니다.');
 
-    const enriched = (await enrichArticles([data], user?.id))[0];
-    return { data: { article: toArticleType(enriched) }, status: 200 };
+    if (error || !data) throw new Error('게시글을 찾을 수 없습니다.');
+    const articleDetails = {
+      ...data,
+      favorited: false,
+      favorites_count: 0,
+      tags: data.article_tags?.map((at: any) => at.tags) || [],
+      user_profiles: data.user_profiles
+        ? {
+            ...data.user_profiles,
+            following: false,
+          }
+        : null,
+    };
+    const article = toArticleType(articleDetails);
+    return { data: { article }, status: 200 };
   },
 
   delete: async (slug: string): Promise<ApiResponse<void>> => {
