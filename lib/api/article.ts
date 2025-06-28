@@ -30,7 +30,6 @@ const ARTICLE_SELECT = `
   )
 `;
 
-// 태그별 조회용 select
 const ARTICLE_SELECT_BY_TAG = `
   *,
   user_profiles!articles_author_id_fkey (username, bio, image),
@@ -42,7 +41,38 @@ const ARTICLE_SELECT_BY_TAG = `
 `;
 
 // 즐겨찾기별 조회용 select
-const ARTICLE_SELECT_FAVORITED = `${ARTICLE_SELECT}, article_favorites!inner (user_id)`;
+const ARTICLE_SELECT_FAVORITED = `
+  *,
+  user_profiles!articles_author_id_fkey (
+    username,
+    bio,
+    image
+  ),
+  article_tags (
+    tags (
+      name
+    )
+  ),
+  article_favorites!inner (
+    id,
+    user_id
+  )
+`;
+
+// 상세 페이지용 간단한 select (팔로우/즐겨찾기 정보 제외)
+const ARTICLE_SELECT_DETAIL = `
+  *,
+  user_profiles!articles_author_id_fkey (
+    username,
+    bio,
+    image
+  ),
+  article_tags (
+    tags (
+      name
+    )
+  )
+`;
 
 type ApiResponse<T = any> = {
   data: T;
@@ -278,18 +308,35 @@ const ArticleAPI = {
   },
 
   get: async (slug: string): Promise<ApiResponse<ArticleResponse>> => {
-    const user = await getCurrentUser();
     const articleId = Number(slug);
     const { data, error } = await supabase
       .from('articles')
-      .select(ARTICLE_SELECT)
+      .select(ARTICLE_SELECT_DETAIL)
       .eq('id', articleId)
       .single();
 
     if (error || !data) throw new Error('게시글을 찾을 수 없습니다.');
 
-    const enriched = (await enrichArticles([data], user?.id))[0];
-    return { data: { article: toArticleType(enriched) }, status: 200 };
+    const article: ArticleType = {
+      id: data.id,
+      title: data.title,
+      summary: data.summary,
+      content: data.content,
+      author_id: data.author_id,
+      created_at: data.created_at,
+      updated_at: data.updated_at,
+      favorited: false,
+      favorites_count: 0,
+      author: data.user_profiles && {
+        username: data.user_profiles.username,
+        bio: data.user_profiles.bio,
+        image: data.user_profiles.image,
+        following: false,
+      },
+      tags: data.article_tags?.map((at: any) => at.tags.name) || [],
+    };
+
+    return { data: { article }, status: 200 };
   },
 
   delete: async (slug: string): Promise<ApiResponse<void>> => {
