@@ -23,6 +23,10 @@ const ARTICLE_SELECT = `
     tags (
       name
     )
+  ),
+  article_favorites (
+    id,
+    user_id
   )
 `;
 
@@ -56,66 +60,55 @@ const getUserProfile = async (username: string) => {
   return error ? null : data;
 };
 
-const getFavoriteMeta = async (articleId: number, userId?: string) => {
-  const { count = 0 } = await supabase
-    .from('article_favorites')
-    .select('*', { count: 'exact', head: true })
-    .eq('article_id', articleId);
+const getFollowStatus = async (currentUserId: string, authorIds: string[]) => {
+  if (!currentUserId || authorIds.length === 0) return {};
 
-  let favorited = false;
-  if (userId) {
-    const { data } = await supabase
-      .from('article_favorites')
-      .select('id')
-      .eq('article_id', articleId)
-      .eq('user_id', userId)
-      .maybeSingle();
-    favorited = !!data;
-  }
+  const { data } = await supabase
+    .from('user_followers')
+    .select('to_user_id')
+    .eq('from_user_id', currentUserId)
+    .in('to_user_id', authorIds);
 
-  return { favorited, favorites_count: count };
-};
+  // authorId를 key로 하는 맵 생성
+  const followMap: Record<string, boolean> = {};
+  authorIds.forEach((id) => (followMap[id] = false));
+  data.forEach((follow) => (followMap[follow.to_user_id] = true));
 
-const getFollowStatus = async (currentUserId: string, authorId: string) => {
-  try {
-    const { data, error } = await supabase
-      .from('user_followers')
-      .select('id')
-      .eq('from_user_id', currentUserId)
-      .eq('to_user_id', authorId)
-      .maybeSingle();
-
-    if (error) {
-      console.warn('팔로우 상태 확인 실패:', error);
-      return false;
-    }
-
-    return !!data;
-  } catch (error) {
-    console.warn('팔로우 상태 확인 실패:', error);
-    return false;
-  }
+  return followMap;
 };
 
 const enrichArticles = async (articles: any[], currentUserId?: string) => {
-  return Promise.all(
-    articles.map(async (article) => {
-      const meta = await getFavoriteMeta(article.id, currentUserId);
-      const following = currentUserId
-        ? await getFollowStatus(currentUserId, article.author_id)
-        : false;
+  if (articles.length === 0) return [];
 
-      return {
-        ...article,
-        ...meta,
-        tags: article.article_tags?.map((at: any) => at.tags) || [],
-        user_profiles: {
-          ...article.user_profiles,
-          following,
-        },
-      };
-    }),
-  );
+  // 팔로우 상태를 한 번에 조회
+  const authorIds = Array.from(new Set(articles.map((a) => a.author_id)));
+  const followMap = currentUserId
+    ? await getFollowStatus(currentUserId, authorIds)
+    : {};
+
+  return articles.map((article) => {
+    // 즐겨찾기 데이터 계산 (이미 조인으로 가져온 데이터 사용)
+    const favorited = currentUserId
+      ? article.article_favorites?.some((f: any) => f.user_id === currentUserId)
+      : false;
+    const favorites_count = article.article_favorites?.length || 0;
+
+    // 팔로우 상태 설정
+    const following = currentUserId
+      ? followMap[article.author_id] || false
+      : false;
+
+    return {
+      ...article,
+      favorited,
+      favorites_count,
+      tags: article.article_tags?.map((at: any) => at.tags) || [],
+      user_profiles: {
+        ...article.user_profiles,
+        following,
+      },
+    };
+  });
 };
 
 const toArticleType = (article: any): ArticleType => ({
@@ -151,6 +144,7 @@ const fetchArticles = async (
   } = await query
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1);
+
   if (error) throw error;
 
   const enriched = await enrichArticles(data, userId);
@@ -220,7 +214,11 @@ const ArticleAPI = {
         `
         *,
         user_profiles!articles_author_id_fkey (username, bio, image),
-        article_tags!inner (tags!inner (name))
+        article_tags!inner (tags!inner (name)),
+        article_favorites (
+          id,
+          user_id
+        )
       `,
         { count: 'exact' },
       )
@@ -263,7 +261,6 @@ const ArticleAPI = {
     if (!user) throw new Error('인증되지 않은 사용자입니다.');
 
     try {
-      // 현재 사용자 자신의 글들을 가져옴
       const query = supabase
         .from('articles')
         .select(ARTICLE_SELECT, { count: 'exact' })
@@ -285,6 +282,7 @@ const ArticleAPI = {
       .select(ARTICLE_SELECT)
       .eq('id', articleId)
       .single();
+
     if (error || !data) throw new Error('게시글을 찾을 수 없습니다.');
 
     const enriched = (await enrichArticles([data], user?.id))[0];
