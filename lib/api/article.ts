@@ -316,26 +316,19 @@ const ArticleAPI = {
       .single();
 
     if (error || !data) throw new Error('게시글을 찾을 수 없습니다.');
-
-    const article: ArticleType = {
-      id: data.id,
-      title: data.title,
-      summary: data.summary,
-      content: data.content,
-      author_id: data.author_id,
-      created_at: data.created_at,
-      updated_at: data.updated_at,
+    const articleDetails = {
+      ...data,
       favorited: false,
       favorites_count: 0,
-      author: data.user_profiles && {
-        username: data.user_profiles.username,
-        bio: data.user_profiles.bio,
-        image: data.user_profiles.image,
-        following: false,
-      },
-      tags: data.article_tags?.map((at: any) => at.tags.name) || [],
+      tags: data.article_tags?.map((at: any) => at.tags) || [],
+      user_profiles: data.user_profiles
+        ? {
+            ...data.user_profiles,
+            following: false,
+          }
+        : null,
     };
-
+    const article = toArticleType(articleDetails);
     return { data: { article }, status: 200 };
   },
 
