@@ -30,6 +30,20 @@ const ARTICLE_SELECT = `
   )
 `;
 
+// 태그별 조회용 select
+const ARTICLE_SELECT_BY_TAG = `
+  *,
+  user_profiles!articles_author_id_fkey (username, bio, image),
+  article_tags!inner (tags!inner (name)),
+  article_favorites (
+    id,
+    user_id
+  )
+`;
+
+// 즐겨찾기별 조회용 select
+const ARTICLE_SELECT_FAVORITED = `${ARTICLE_SELECT}, article_favorites!inner (user_id)`;
+
 type ApiResponse<T = any> = {
   data: T;
   status: number;
@@ -51,13 +65,15 @@ const throttle = (() => {
   };
 })();
 
-const getUserProfile = async (username: string) => {
+const getUserIdByUsername = async (
+  username: string,
+): Promise<string | null> => {
   const { data, error } = await supabase
     .from('user_profiles')
     .select('user_id')
     .eq('username', username)
     .single();
-  return error ? null : data;
+  return error ? null : data?.user_id;
 };
 
 const getFollowStatus = async (currentUserId: string, authorIds: string[]) => {
@@ -191,13 +207,13 @@ const ArticleAPI = {
     limit = 5,
   ): Promise<ApiResponse<ArticleListResponse>> => {
     const user = await getCurrentUser();
-    const profile = await getUserProfile(author);
+    const profile = await getUserIdByUsername(author);
     if (!profile)
       return { data: { articles: [], articlesCount: 0 }, status: 200 };
     const query = supabase
       .from('articles')
       .select(ARTICLE_SELECT, { count: 'exact' })
-      .eq('author_id', profile.user_id);
+      .eq('author_id', profile);
     const result = await fetchArticles(query, page, limit, user?.id);
     return { data: result, status: 200 };
   },
@@ -210,18 +226,7 @@ const ArticleAPI = {
     const user = await getCurrentUser();
     const query = supabase
       .from('articles')
-      .select(
-        `
-        *,
-        user_profiles!articles_author_id_fkey (username, bio, image),
-        article_tags!inner (tags!inner (name)),
-        article_favorites (
-          id,
-          user_id
-        )
-      `,
-        { count: 'exact' },
-      )
+      .select(ARTICLE_SELECT_BY_TAG, { count: 'exact' })
       .eq('article_tags.tags.name', tag);
 
     const result = await fetchArticles(query, page, limit, user?.id);
@@ -233,16 +238,14 @@ const ArticleAPI = {
     page: number,
   ): Promise<ApiResponse<ArticleListResponse>> => {
     const user = await getCurrentUser();
-    const profile = await getUserProfile(author);
+    const profile = await getUserIdByUsername(author);
     if (!profile)
       return { data: { articles: [], articlesCount: 0 }, status: 200 };
 
     const query = supabase
       .from('articles')
-      .select(`${ARTICLE_SELECT}, article_favorites!inner (user_id)`, {
-        count: 'exact',
-      })
-      .eq('article_favorites.user_id', profile.user_id);
+      .select(ARTICLE_SELECT_FAVORITED, { count: 'exact' })
+      .eq('article_favorites.user_id', profile);
 
     const result = await fetchArticles(
       query,
