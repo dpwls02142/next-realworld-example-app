@@ -18,14 +18,13 @@ const checkFollowStatus = async (
   targetUserId: string,
 ) => {
   try {
-    const { data: followData } = await supabase
+    const { data } = await supabase
       .from('user_followers')
-      .select('id')
+      .select('to_user_id')
       .eq('from_user_id', currentUserId)
-      .eq('to_user_id', targetUserId)
-      .single();
+      .eq('to_user_id', targetUserId);
 
-    return !!followData;
+    return data && data.length > 0;
   } catch (error) {
     console.warn('팔로우 상태 확인 실패:', error);
     return false;
