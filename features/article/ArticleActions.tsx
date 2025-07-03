@@ -1,6 +1,6 @@
 import Router, { useRouter } from 'next/router';
 import React from 'react';
-import useSWR, { trigger, cache } from 'swr';
+import useSWR, { cache, mutate } from 'swr';
 import CustomLink from '../../shared/components/CustomLink';
 import checkLogin from '../../lib/utils/checkLogin';
 import ArticleAPI from '../../lib/api/article';
@@ -35,7 +35,7 @@ const ArticleActions = ({ article }) => {
         }
       }
 
-      await Promise.all(keysToInvalidate.map((key) => trigger(key)));
+      await Promise.all(keysToInvalidate.map((key) => mutate(key)));
 
       Router.push(`/`);
     } catch (error) {
