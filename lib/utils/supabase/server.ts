@@ -34,3 +34,22 @@ export const getUserProfile = async (userId: string) => {
   if (error) throw error;
   return data;
 };
+
+export const getCurrentUserWithProfile = async () => {
+  const user = await getCurrentUser();
+  if (!user) return null;
+
+  try {
+    const profile = await getUserProfile(user.id);
+    return {
+      id: user.id,
+      email: user.email,
+      username: profile.username,
+      bio: profile.bio,
+      image: profile.image,
+    };
+  } catch (error) {
+    console.error('Profile not found:', error);
+    return null;
+  }
+};
