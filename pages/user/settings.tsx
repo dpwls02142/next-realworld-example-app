@@ -5,11 +5,12 @@ import useSWR, { mutate, trigger } from 'swr';
 import SettingsForm from '../../features/profile/SettingsForm';
 import checkLogin from '../../lib/utils/checkLogin';
 import { getCurrentUserWithProfile } from '../../lib/utils/supabase/server';
+import { getCurrentUser } from '../../lib/utils/supabase/client';
 
 import UserAPI from '../../lib/api/user';
 
 function Settings({ user }) {
-  const { data: currentUser } = useSWR('user', getCurrentUserWithProfile, {
+  const { data: currentUser } = useSWR('user', getCurrentUser, {
     initialData: user,
   });
 

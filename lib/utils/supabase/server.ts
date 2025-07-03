@@ -44,6 +44,11 @@ export const getCurrentUserWithProfile = async () => {
     return {
       id: user.id,
       email: user.email,
+      user_metadata: {
+        username: profile.username,
+        bio: profile.bio,
+        image: profile.image,
+      },
       username: profile.username,
       bio: profile.bio,
       image: profile.image,
