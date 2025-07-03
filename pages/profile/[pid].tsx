@@ -12,7 +12,7 @@ import ProfileTab from '../../features/profile/ProfileTab';
 import UserAPI from '../../lib/api/user';
 import checkLogin from '../../lib/utils/checkLogin';
 import { getCurrentUser } from '../../lib/utils/supabase/client';
-import { useFollowersCount } from '../../lib/hooks/useFollow';
+import { useFollowersCountByUserId } from '../../lib/hooks/useFollow';
 
 function Profile({ initialProfile }) {
   const router = useRouter();
@@ -39,7 +39,7 @@ function Profile({ initialProfile }) {
   const isUser =
     currentUser && username === currentUser?.user_metadata?.username;
 
-  const { data: followersCount } = useFollowersCount(user_id);
+  const { data: followersCount } = useFollowersCountByUserId(user_id);
 
   return (
     <div className="profile-page">

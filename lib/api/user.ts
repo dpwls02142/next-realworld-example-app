@@ -233,6 +233,7 @@ const UserAPI = {
         data: {
           profile: {
             username,
+            user_id: targetProfile.user_id,
             following: true,
           },
         },
@@ -272,6 +273,7 @@ const UserAPI = {
         data: {
           profile: {
             username,
+            user_id: targetProfile.user_id,
             following: false,
           },
         },
@@ -332,7 +334,7 @@ const UserAPI = {
     }
   },
 
-  getFollowersCount: async (userId: string) => {
+  getFollowersCountByUserId: async (userId: string) => {
     const { count } = await supabase
       .from('user_followers')
       .select('*', { count: 'exact', head: true })

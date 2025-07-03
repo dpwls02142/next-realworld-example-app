@@ -7,14 +7,14 @@ import NavLink from './NavLink';
 import { usePageDispatch } from '../../../lib/context/PageContext';
 import checkLogin from '../../../lib/utils/checkLogin';
 import { getCurrentUser } from '../../../lib/utils/supabase/client';
-import { useFollowersCount } from '../../../lib/hooks/useFollow';
+import { useFollowersCountByUserId } from '../../../lib/hooks/useFollow';
 
 const Navbar = () => {
   const setPage = usePageDispatch();
   const { data: currentUser } = useSWR('user', getCurrentUser);
   const isLoggedIn = checkLogin(currentUser);
 
-  const { data: followersCount } = useFollowersCount(currentUser?.id);
+  const { data: followersCount } = useFollowersCountByUserId(currentUser?.id);
 
   const handleClick = useCallback(() => setPage(0), []);
 
