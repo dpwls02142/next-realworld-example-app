@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Router from 'next/router';
+import { cache, mutate } from 'swr';
 
 import ArticleAPI from '../../lib/api/article';
 import EditorForm, { ArticleInput } from '../../features/editor/EditorForm';
@@ -17,6 +18,20 @@ function NewArticlePage() {
       const response = await ArticleAPI.create(newData);
 
       if (response.status === 200 || response.status === 201) {
+        // 새 게시글 작성 후 관련 캐시 무효화
+        const cacheMap = cache;
+        const keysToInvalidate = [];
+
+        for (const key of cacheMap.keys()) {
+          if (Array.isArray(key) && key[0] === 'articles') {
+            keysToInvalidate.push(key);
+          }
+        }
+
+        await Promise.all(
+          keysToInvalidate.map((key) => mutate(key, undefined, true)),
+        );
+
         setPage(0);
         Router.push(`/`).then(() => {
           window.scrollTo(0, 0);

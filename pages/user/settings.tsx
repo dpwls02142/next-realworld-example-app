@@ -4,11 +4,9 @@ import useSWR, { mutate, trigger } from 'swr';
 
 import SettingsForm from '../../features/profile/SettingsForm';
 import checkLogin from '../../lib/utils/checkLogin';
+import { getCurrentUserWithProfile } from '../../lib/utils/supabase/server';
 import { getCurrentUser } from '../../lib/utils/supabase/client';
-import {
-  getCurrentUser as getServerCurrentUser,
-  getUserProfile,
-} from '../../lib/utils/supabase/server';
+
 import UserAPI from '../../lib/api/user';
 
 function Settings({ user }) {
@@ -60,46 +58,13 @@ function Settings({ user }) {
 
 export async function getServerSideProps(context) {
   try {
-    const user = await getServerCurrentUser();
-
-    if (!user) {
-      return {
-        props: {
-          user: null,
-        },
-      };
-    }
-
-    const profile = await getUserProfile(user.id);
-
-    if (!profile) {
-      return {
-        props: {
-          user: null,
-        },
-      };
-    }
-
-    const userProps = {
-      id: user.id,
-      email: user.email,
-      user_metadata: {
-        username: profile.username,
-        bio: profile.bio,
-        image: profile.image,
-      },
-      username: profile.username,
-      bio: profile.bio,
-      image: profile.image,
-    };
-
+    const user = await getCurrentUserWithProfile();
     return {
       props: {
-        user: userProps,
+        user,
       },
     };
   } catch (error) {
-    console.error('getServerSideProps error:', error);
     return {
       props: {
         user: null,

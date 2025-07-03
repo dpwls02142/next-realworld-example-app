@@ -10,11 +10,11 @@ type MutationContext = {
   previousProfile: any;
 };
 
-export const useFollowersCount = (username: string) => {
+export const useFollowersCountByUserId = (userId: string) => {
   return useQuery({
-    queryKey: ['followers', username],
-    queryFn: () => UserAPI.getFollowersCount(username),
-    enabled: !!username,
+    queryKey: ['followers', userId],
+    queryFn: () => UserAPI.getFollowersCountByUserId(userId),
+    enabled: !!userId,
     staleTime: 1000 * 60 * 5, // 5분간 캐시 유지
   });
 };
@@ -51,6 +51,17 @@ export const useFollowMutation = () => {
 
       return { previousProfile };
     },
+    onSuccess: async (data, variables) => {
+      await queryClient.refetchQueries({
+        queryKey: ['profile', variables.username],
+      });
+      if (data?.data?.profile?.user_id) {
+        await queryClient.refetchQueries({
+          queryKey: ['followers', data.data.profile.user_id],
+        });
+      }
+    },
+
     onError: (err, variables, context) => {
       if (context?.previousProfile) {
         queryClient.setQueryData(
@@ -58,11 +69,6 @@ export const useFollowMutation = () => {
           context.previousProfile,
         );
       }
-    },
-    onSettled: (data, error, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ['profile', variables.username],
-      });
     },
   });
 };
