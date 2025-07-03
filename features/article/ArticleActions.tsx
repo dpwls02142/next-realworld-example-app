@@ -1,7 +1,6 @@
 import Router, { useRouter } from 'next/router';
 import React from 'react';
-import useSWR, { trigger } from 'swr';
-
+import useSWR, { trigger, cache } from 'swr';
 import CustomLink from '../../shared/components/CustomLink';
 import checkLogin from '../../lib/utils/checkLogin';
 import ArticleAPI from '../../lib/api/article';
@@ -22,22 +21,21 @@ const ArticleActions = ({ article }) => {
     if (!isLoggedIn) return;
 
     const result = window.confirm(CONFIRM_DELETE_MESSAGE);
-
     if (!result) return;
 
     try {
       await ArticleAPI.delete(id as string);
 
-      const cacheKeys = [
-        ['articles', 'all', 0],
-        ['articles', 'all', 1],
-        ['articles', 'all', 2],
-        ['articles', 'feed', 0],
-        ['articles', 'feed', 1],
-        ['articles', 'feed', 2],
-      ];
+      const cacheMap = cache;
+      const keysToInvalidate = [];
 
-      await Promise.all(cacheKeys.map((key) => trigger(key)));
+      for (const key of cacheMap.keys()) {
+        if (Array.isArray(key) && key[0] === 'articles') {
+          keysToInvalidate.push(key);
+        }
+      }
+
+      await Promise.all(keysToInvalidate.map((key) => trigger(key)));
 
       Router.push(`/`);
     } catch (error) {
