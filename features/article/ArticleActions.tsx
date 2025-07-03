@@ -35,7 +35,9 @@ const ArticleActions = ({ article }) => {
         }
       }
 
-      await Promise.all(keysToInvalidate.map((key) => mutate(key)));
+      await Promise.all(
+        keysToInvalidate.map((key) => mutate(key, undefined, true)),
+      );
 
       Router.push(`/`);
     } catch (error) {
