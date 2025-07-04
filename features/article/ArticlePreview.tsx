@@ -9,7 +9,7 @@ import { usePageDispatch } from '../../lib/context/PageContext';
 import checkLogin from '../../lib/utils/checkLogin';
 import { getCurrentUser } from '../../lib/utils/supabase/client';
 import { ArticleType } from '../../lib/types/articleType';
-import { useFavoriteMutation } from '../../lib/hooks/useFavoriteMutation';
+import { useFavoriteMutation } from '../../lib/hooks/useFavorite';
 
 type ArticleProps = {
   article: ArticleType;
