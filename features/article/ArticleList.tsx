@@ -1,6 +1,5 @@
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
-import useSWR from 'swr';
+import { useQuery } from '@tanstack/react-query';
 
 import ArticlePreview from './ArticlePreview';
 import ErrorMessage from '../../shared/components/ErrorMessage';
@@ -38,7 +37,11 @@ const ArticleList = () => {
   const { pathname, query } = router;
   const { favorite, follow, tag, pid } = query;
 
-  const { data: currentUser } = useSWR('user', getCurrentUser);
+  const { data: currentUser } = useQuery({
+    queryKey: ['user'],
+    queryFn: getCurrentUser,
+  });
+
   const isLoggedIn = checkLogin(currentUser);
 
   const isProfilePage = pathname.startsWith('/profile');
@@ -57,7 +60,7 @@ const ArticleList = () => {
 
   const lastIndex = calculateLastIndex(pageCount);
 
-  function buildFetchKey() {
+  function buildQueryKey() {
     if (isTagPage) {
       return ['articles', 'tag', tag, page];
     }
@@ -97,14 +100,15 @@ const ArticleList = () => {
     return await ArticleAPI.all(page);
   }
 
-  const fetchKey = buildFetchKey();
-  const { data, error } = useSWR(fetchKey, fetchArticles);
-
-  useEffect(() => {
-    if (data?.data?.articlesCount) {
-      setPageCount(data.data.articlesCount);
-    }
-  }, [data?.data?.articlesCount, setPageCount]);
+  const { data, error, isLoading } = useQuery({
+    queryKey: buildQueryKey(),
+    queryFn: fetchArticles,
+    onSuccess: (response) => {
+      if (response?.data?.articlesCount) {
+        setPageCount(response.data.articlesCount);
+      }
+    },
+  });
 
   const articles = data?.data?.articles || [];
   const articlesCount = data?.data?.articlesCount || 0;
@@ -120,7 +124,7 @@ const ArticleList = () => {
     );
   }
 
-  if (!data) return <LoadingSpinner />;
+  if (isLoading) return <LoadingSpinner />;
 
   if (articles.length === 0) {
     return <div className="article-preview">{ERROR_MESSAGES.NO_ARTICLES}</div>;
