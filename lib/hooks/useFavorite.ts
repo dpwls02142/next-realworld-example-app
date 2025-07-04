@@ -20,13 +20,12 @@ export const useFavoriteMutation = () => {
         return await ArticleAPI.favorite(articleId);
       }
     },
-    onSuccess: async (data, variables) => {
-      await queryClient.invalidateQueries({ queryKey: ['articles'] });
-      await queryClient.invalidateQueries({
-        queryKey: ['articles', 'favorited'],
-      });
-      await queryClient.invalidateQueries({ queryKey: ['profile'] });
-      await queryClient.invalidateQueries({ queryKey: ['user'] });
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['articles'] }),
+        queryClient.invalidateQueries({ queryKey: ['profile'] }),
+        queryClient.invalidateQueries({ queryKey: ['user'] }),
+      ]);
     },
     onError: (error) => {
       console.error(error);
