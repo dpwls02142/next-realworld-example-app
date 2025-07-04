@@ -1,4 +1,3 @@
-import { useRef, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import ArticleAPI from '../api/article';
 
@@ -9,23 +8,12 @@ type FavoriteMutationParams = {
 
 export const useFavoriteMutation = () => {
   const queryClient = useQueryClient();
-  const isMountedRef = useRef(true);
-
-  useEffect(() => {
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
-
   const {
     mutate: mutateFavorite,
     isLoading,
     error,
   } = useMutation({
     mutationFn: async ({ articleId, isFavorited }: FavoriteMutationParams) => {
-      if (!isMountedRef.current) {
-        throw new Error('Component is unmounted');
-      }
       if (isFavorited) {
         return await ArticleAPI.unfavorite(articleId);
       } else {
