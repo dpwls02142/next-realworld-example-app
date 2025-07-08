@@ -4,7 +4,6 @@ import useSWR from 'swr';
 
 import ArticleList from '../../features/article/ArticleList';
 import CustomImage from '../../shared/components/CustomImage';
-import ErrorMessage from '../../shared/components/ErrorMessage';
 import Maybe from '../../shared/components/Maybe';
 import EditProfileButton from '../../features/profile/EditProfileButton';
 import FollowUserButton from '../../features/profile/FollowUserButton';
@@ -27,12 +26,14 @@ function Profile({ initialProfile }) {
     { initialData: initialProfile },
   );
 
-  if (profileError) return <ErrorMessage message="Can't load profile" />;
+  if (profileError) {
+    throw profileError;
+  }
 
   const profile =
     fetchedProfile?.data?.profile || initialProfile?.data?.profile;
 
-  const { user_id, username, bio, image, following } = profile;
+  const { user_id, username, bio, image } = profile || {};
 
   const { data: currentUser } = useSWR('user', getCurrentUser);
   const isLoggedIn = checkLogin(currentUser);
@@ -82,14 +83,18 @@ function Profile({ initialProfile }) {
   );
 }
 
-Profile.getInitialProps = async ({ query }) => {
+Profile.getInitialProps = async ({ query, res }) => {
   const { pid } = query;
   try {
     const decodedUsername = decodeURIComponent(String(pid));
     const result = await UserAPI.get(decodedUsername);
     return { initialProfile: result };
   } catch (error) {
-    console.error('Profile fetch error:', error);
+    console.error('Error in getInitialProps:', error);
+    if (res) {
+      res.statusCode = 404;
+    }
+    return {};
   }
 };
 
