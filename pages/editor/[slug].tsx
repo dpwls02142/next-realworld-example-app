@@ -1,37 +1,31 @@
 import { useState } from 'react';
 import Router from 'next/router';
-import { cache, mutate } from 'swr';
+import { useQueryClient } from '@tanstack/react-query';
 
 import ArticleAPI from '../../lib/api/article';
 import EditorForm, { ArticleInput } from '../../features/editor/EditorForm';
 
 function EditArticlePage({ article }) {
   const [isLoading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
 
   const handleSubmit = async (editData: ArticleInput) => {
     setLoading(true);
 
     try {
-      const response = await ArticleAPI.update(editData, article.id.toString());
+      await ArticleAPI.update(editData, article.id.toString());
 
-      if (response.status === 200 || response.status === 201) {
-        // 게시글 수정 후 관련 캐시 무효화
-        const cacheMap = cache;
-        const keysToInvalidate = [];
+      await Promise.all([
+        queryClient.removeQueries({
+          queryKey: ['articles'],
+          exact: false,
+        }),
+      ]);
 
-        for (const key of cacheMap.keys()) {
-          if (Array.isArray(key) && key[0] === 'articles') {
-            keysToInvalidate.push(key);
-          }
-        }
-
-        await Promise.all(
-          keysToInvalidate.map((key) => mutate(key, undefined, true)),
-        );
-
-        Router.push('/');
-        return;
-      }
+      Router.push(`/`);
+      return;
+    } catch (error) {
+      alert('게시글 수정에 실패했습니다.');
     } finally {
       setLoading(false);
     }
