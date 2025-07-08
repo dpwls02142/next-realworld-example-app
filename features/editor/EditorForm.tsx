@@ -1,5 +1,5 @@
 import { FormEvent, useReducer } from 'react';
-import ListErrors from '../../shared/components/ListErrors';
+
 import TagInput from './TagInput';
 import editorReducer from '../../lib/utils/editorReducer';
 import validateArticle from '../../lib/utils/validateArticle';
@@ -17,7 +17,6 @@ export type ArticleInput = {
 interface EditorFormProps {
   initialValues: ArticleInput;
   isLoading: boolean;
-  errors: any[];
   onSubmit: (data: ArticleInput) => void;
   submitLabel: string;
 }
@@ -25,7 +24,6 @@ interface EditorFormProps {
 const EditorForm = ({
   initialValues,
   isLoading,
-  errors,
   onSubmit,
   submitLabel,
 }: EditorFormProps) => {
@@ -50,8 +48,6 @@ const EditorForm = ({
 
   return (
     <form onSubmit={handleSubmit}>
-      <ListErrors errors={errors} />
-
       <fieldset>
         <fieldset className="form-group">
           <label htmlFor="article-title">제목</label>

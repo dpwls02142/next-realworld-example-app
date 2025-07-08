@@ -1,49 +1,30 @@
 import { useState } from 'react';
 import Router from 'next/router';
-import { cache, mutate } from 'swr';
 
 import ArticleAPI from '../../lib/api/article';
 import EditorForm, { ArticleInput } from '../../features/editor/EditorForm';
-import { usePageDispatch } from '../../lib/context/PageContext';
+import { useQueryClient } from '@tanstack/react-query';
 
 function NewArticlePage() {
-  const [errors, setErrors] = useState([]);
   const [isLoading, setLoading] = useState(false);
-  const setPage = usePageDispatch();
+  const queryClient = useQueryClient();
 
   const handleSubmit = async (newData: ArticleInput) => {
     setLoading(true);
 
     try {
-      const response = await ArticleAPI.create(newData);
+      await ArticleAPI.create(newData);
 
-      if (response.status === 200 || response.status === 201) {
-        // 새 게시글 작성 후 관련 캐시 무효화
-        const cacheMap = cache;
-        const keysToInvalidate = [];
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['articles'] }),
+        queryClient.invalidateQueries({ queryKey: ['profile'] }),
+        queryClient.invalidateQueries({ queryKey: ['user'] }),
+      ]);
 
-        for (const key of cacheMap.keys()) {
-          if (Array.isArray(key) && key[0] === 'articles') {
-            keysToInvalidate.push(key);
-          }
-        }
-
-        await Promise.all(
-          keysToInvalidate.map((key) => mutate(key, undefined, true)),
-        );
-
-        setPage(0);
-        Router.push(`/`).then(() => {
-          window.scrollTo(0, 0);
-        });
-        return;
-      }
+      Router.push(`/`);
+      return;
     } catch (error) {
-      if (error.code === 'DUPLICATE_TITLE') {
-        setErrors([error.message]);
-      } else {
-        setErrors(['아티클 생성에 실패했습니다.']);
-      }
+      alert('게시글 생성에 실패했습니다.');
     } finally {
       setLoading(false);
     }
@@ -61,7 +42,6 @@ function NewArticlePage() {
               tags: [],
             }}
             isLoading={isLoading}
-            errors={errors}
             onSubmit={handleSubmit}
             submitLabel="Publish Article"
           />

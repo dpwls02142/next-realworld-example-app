@@ -1,6 +1,7 @@
 import Router, { useRouter } from 'next/router';
 import React from 'react';
-import useSWR, { cache, mutate } from 'swr';
+import useSWR from 'swr';
+import { useQueryClient } from '@tanstack/react-query';
 import CustomLink from '../../shared/components/CustomLink';
 import checkLogin from '../../lib/utils/checkLogin';
 import ArticleAPI from '../../lib/api/article';
@@ -13,6 +14,7 @@ const ArticleActions = ({ article }) => {
   const { data: currentUser } = useSWR('user', getCurrentUser);
   const isLoggedIn = checkLogin(currentUser);
   const router = useRouter();
+  const queryClient = useQueryClient();
   const {
     query: { id },
   } = router;
@@ -26,18 +28,12 @@ const ArticleActions = ({ article }) => {
     try {
       await ArticleAPI.delete(id as string);
 
-      const cacheMap = cache;
-      const keysToInvalidate = [];
-
-      for (const key of cacheMap.keys()) {
-        if (Array.isArray(key) && key[0] === 'articles') {
-          keysToInvalidate.push(key);
-        }
-      }
-
-      await Promise.all(
-        keysToInvalidate.map((key) => mutate(key, undefined, true)),
-      );
+      await Promise.all([
+        queryClient.removeQueries({
+          queryKey: ['articles'],
+          exact: false,
+        }),
+      ]);
 
       Router.push(`/`);
     } catch (error) {
