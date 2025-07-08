@@ -16,10 +16,9 @@ function EditArticlePage({ article }) {
       await ArticleAPI.update(editData, article.id.toString());
 
       await Promise.all([
-        queryClient.removeQueries({
-          queryKey: ['articles'],
-          exact: false,
-        }),
+        queryClient.invalidateQueries({ queryKey: ['articles'] }),
+        queryClient.invalidateQueries({ queryKey: ['profile'] }),
+        queryClient.invalidateQueries({ queryKey: ['user'] }),
       ]);
 
       Router.push(`/`);
