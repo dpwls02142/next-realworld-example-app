@@ -18,26 +18,20 @@ function Profile({ initialProfile }) {
   const {
     query: { pid },
   } = router;
-  const decodedUsername = decodeURIComponent(String(pid));
-
-  const { data: fetchedProfile, error: profileError } = useSWR(
-    ['profile', decodedUsername],
-    () => UserAPI.get(decodedUsername),
+  const { data: fetchedProfile } = useSWR(
+    ['profile', pid],
+    () => UserAPI.get(String(pid)),
     { initialData: initialProfile },
   );
-
-  if (profileError) {
-    throw profileError;
-  }
 
   const profile =
     fetchedProfile?.data?.profile || initialProfile?.data?.profile;
 
-  const { user_id, username, bio, image } = profile || {};
+  const { user_id, username, bio, image } = profile;
 
   const { data: currentUser } = useSWR('user', getCurrentUser);
   const isLoggedIn = checkLogin(currentUser);
-  const isUser =
+  const isLoggedinUser =
     currentUser && username === currentUser?.user_metadata?.username;
 
   const { data: followersCount } = useFollowersCountByUserId(user_id);
@@ -60,9 +54,9 @@ function Profile({ initialProfile }) {
                   팔로워 {followersCount || 0}명
                 </span>
               </div>
-              <EditProfileButton isUser={isUser} />
+              <EditProfileButton isUser={isLoggedinUser} />
               <Maybe test={isLoggedIn}>
-                <FollowUserButton isUser={isUser} username={username} />
+                <FollowUserButton isUser={isLoggedinUser} username={username} />
               </Maybe>
             </div>
           </div>
@@ -83,18 +77,13 @@ function Profile({ initialProfile }) {
   );
 }
 
-Profile.getInitialProps = async ({ query, res }) => {
+Profile.getInitialProps = async ({ query }) => {
   const { pid } = query;
   try {
-    const decodedUsername = decodeURIComponent(String(pid));
-    const result = await UserAPI.get(decodedUsername);
+    const result = await UserAPI.get(String(pid));
     return { initialProfile: result };
   } catch (error) {
-    console.error('Error in getInitialProps:', error);
-    if (res) {
-      res.statusCode = 404;
-    }
-    return {};
+    return { initialProfile: null };
   }
 };
 
