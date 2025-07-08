@@ -63,10 +63,19 @@ function EditArticlePage({ article }) {
 
 export async function getServerSideProps({ query }) {
   const { slug } = query;
-  const {
-    data: { article },
-  } = await ArticleAPI.get(slug);
-  return { props: { article } };
+  try {
+    const {
+      data: { article },
+    } = await ArticleAPI.get(slug);
+
+    return {
+      props: {
+        article: article,
+      },
+    };
+  } catch (error) {
+    return { props: {} };
+  }
 }
 
 export default EditArticlePage;
