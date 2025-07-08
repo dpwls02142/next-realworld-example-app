@@ -60,22 +60,10 @@ function ArticlePage({ article }: { article: ArticleType }) {
 
 export async function getServerSideProps({ query, res }) {
   const { id } = query;
-
-  if (!id || isNaN(Number(id))) {
-    res.writeHead(302, { Location: '/404' });
-    res.end();
-    return { props: {} };
-  }
-
   try {
     const {
       data: { article },
     } = await ArticleAPI.get(id);
-    if (!article) {
-      res.writeHead(302, { Location: '/404' });
-      res.end();
-      return { props: {} };
-    }
     return {
       props: {
         article: article,

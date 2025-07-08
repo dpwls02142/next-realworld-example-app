@@ -78,28 +78,13 @@ function Profile({ profile }) {
 
 export async function getServerSideProps({ query, res }) {
   const { pid } = query;
-
-  if (!pid) {
-    res.writeHead(302, { Location: '/404' });
-    res.end();
-    return { props: {} };
-  }
-
   try {
-    const result = await UserAPI.get(String(pid));
-    if (
-      !result ||
-      !result.data ||
-      !result.data.profile
-    ) {
-      res.writeHead(302, { Location: '/404' });
-      res.end();
-      return { props: {} };
-    }
-
+    const {
+      data: { profile },
+    } = await UserAPI.get(String(pid));
     return {
       props: {
-        profile: result.data.profile,
+        profile: profile,
       },
     };
   } catch (error) {
