@@ -6,7 +6,6 @@ import ArticleAPI from '../../lib/api/article';
 import EditorForm, { ArticleInput } from '../../features/editor/EditorForm';
 
 function EditArticlePage({ article }) {
-  const [errors, setErrors] = useState([]);
   const [isLoading, setLoading] = useState(false);
 
   const handleSubmit = async (editData: ArticleInput) => {
@@ -33,12 +32,6 @@ function EditArticlePage({ article }) {
         Router.push('/');
         return;
       }
-    } catch (error) {
-      if (error.code === 'DUPLICATE_TITLE') {
-        setErrors([error.message]);
-      } else {
-        setErrors(['아티클 수정에 실패했습니다.']);
-      }
     } finally {
       setLoading(false);
     }
@@ -51,7 +44,6 @@ function EditArticlePage({ article }) {
           <EditorForm
             initialValues={article}
             isLoading={isLoading}
-            errors={errors}
             onSubmit={handleSubmit}
             submitLabel="Update Article"
           />
