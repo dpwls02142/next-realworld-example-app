@@ -16,6 +16,7 @@ import { DEFAULT_LIMIT } from '../../lib/utils/constant';
 import ArticleAPI from '../../lib/api/article';
 import checkLogin from '../../lib/utils/checkLogin';
 import { getCurrentUser } from '../../lib/utils/supabase/client';
+import useSWR from 'swr';
 
 const PAGINATION_THRESHOLD = 20;
 const MAX_PAGE_COUNT = 480;
@@ -37,10 +38,7 @@ const ArticleList = () => {
   const { pathname, query } = router;
   const { favorite, follow, tag, pid } = query;
 
-  const { data: currentUser } = useQuery({
-    queryKey: ['user'],
-    queryFn: getCurrentUser,
-  });
+  const { data: currentUser } = useSWR('user', getCurrentUser);
 
   const isLoggedIn = checkLogin(currentUser);
 
