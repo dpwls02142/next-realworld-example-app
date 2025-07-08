@@ -14,19 +14,7 @@ import { getCurrentUser } from '../../lib/utils/supabase/client';
 import { useFollowersCountByUserId } from '../../lib/hooks/useFollow';
 
 function Profile({ profile }) {
-  const router = useRouter();
-  const {
-    query: { pid },
-  } = router;
-  const { data: fetchedProfile } = useSWR(
-    ['profile', pid],
-    () => UserAPI.get(String(pid)),
-    { initialData: { data: { profile }, status: 200 } },
-  );
-
-  const currentProfile = fetchedProfile?.data?.profile || profile;
-
-  const { user_id, username, bio, image } = currentProfile;
+  const { user_id, username, bio, image } = profile;
 
   const { data: currentUser } = useSWR('user', getCurrentUser);
   const isLoggedIn = checkLogin(currentUser);
@@ -66,7 +54,7 @@ function Profile({ profile }) {
         <div className="row">
           <div className="col-xs-12 col-md-10 offset-md-1">
             <div className="articles-toggle">
-              <ProfileTab profile={currentProfile} />
+              <ProfileTab profile={profile} />
             </div>
             <ArticleList />
           </div>
