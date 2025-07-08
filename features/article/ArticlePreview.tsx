@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Router from 'next/router';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import useSWR from 'swr';
 
 import CustomLink from '../../shared/components/CustomLink';
@@ -25,10 +25,6 @@ const ArticlePreview = ({ article }: ArticleProps) => {
   const isLoggedIn = checkLogin(currentUser);
   const favoriteMutation = useFavoriteMutation();
 
-  // article prop이 변경될 때마다 preview 상태 업데이트
-  useEffect(() => {
-    setPreview(article);
-  }, [article]);
   const toggleFavorite = async () => {
     if (!isLoggedIn) {
       Router.push('/user/login');
@@ -67,14 +63,7 @@ const ArticlePreview = ({ article }: ArticleProps) => {
 
   return (
     <div className="article-preview" style={{ padding: '1.5rem 0.5rem' }}>
-      <div
-        className="article-meta-wrapper"
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-      >
+      <div className="article-meta-wrapper">
         <ArticleMeta article={preview} showActions={false} />
         <div className="pull-xs-right">
           <button
