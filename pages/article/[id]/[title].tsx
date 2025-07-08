@@ -59,11 +59,21 @@ function ArticlePage({ article }: { article: ArticleType }) {
 }
 
 export async function getServerSideProps({ query, res }) {
-  const { id } = query;
+  const { id, title } = query;
   try {
     const {
       data: { article },
     } = await ArticleAPI.get(id);
+
+    // URL의 title과 실제 게시글의 title을 비교
+    // URL에서 title을 URL 디코딩하고, 실제 title과 정확히 일치하는지 확인
+    const decodedTitle = decodeURIComponent(title as string);
+    if (article.title !== decodedTitle) {
+      res.writeHead(302, { Location: '/404' });
+      res.end();
+      return { props: {} };
+    }
+
     return {
       props: {
         article: article,
