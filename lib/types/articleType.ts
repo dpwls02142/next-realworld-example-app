@@ -14,6 +14,10 @@ export type ArticleType = {
   tags?: string[];
 };
 
+export interface ArticleResponse {
+  article: ArticleType;
+}
+
 export interface ArticleListResponse {
   articles: ArticleType[];
   articlesCount: number;
