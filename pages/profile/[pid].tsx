@@ -13,7 +13,7 @@ import checkLogin from '../../lib/utils/checkLogin';
 import { getCurrentUser } from '../../lib/utils/supabase/client';
 import { useFollowersCountByUserId } from '../../lib/hooks/useFollow';
 
-function Profile({ initialProfile }) {
+function Profile({ profile }) {
   const router = useRouter();
   const {
     query: { pid },
@@ -21,13 +21,12 @@ function Profile({ initialProfile }) {
   const { data: fetchedProfile } = useSWR(
     ['profile', pid],
     () => UserAPI.get(String(pid)),
-    { initialData: initialProfile },
+    { initialData: { data: { profile }, status: 200 } },
   );
 
-  const profile =
-    fetchedProfile?.data?.profile || initialProfile?.data?.profile;
+  const currentProfile = fetchedProfile?.data?.profile || profile;
 
-  const { user_id, username, bio, image } = profile;
+  const { user_id, username, bio, image } = currentProfile;
 
   const { data: currentUser } = useSWR('user', getCurrentUser);
   const isLoggedIn = checkLogin(currentUser);
@@ -67,7 +66,7 @@ function Profile({ initialProfile }) {
         <div className="row">
           <div className="col-xs-12 col-md-10 offset-md-1">
             <div className="articles-toggle">
-              <ProfileTab profile={profile} />
+              <ProfileTab profile={currentProfile} />
             </div>
             <ArticleList />
           </div>
@@ -77,14 +76,37 @@ function Profile({ initialProfile }) {
   );
 }
 
-Profile.getInitialProps = async ({ query }) => {
+export async function getServerSideProps({ query, res }) {
   const { pid } = query;
+
+  if (!pid) {
+    res.writeHead(302, { Location: '/404' });
+    res.end();
+    return { props: {} };
+  }
+
   try {
     const result = await UserAPI.get(String(pid));
-    return { initialProfile: result };
+    if (
+      !result ||
+      !result.data ||
+      !result.data.profile
+    ) {
+      res.writeHead(302, { Location: '/404' });
+      res.end();
+      return { props: {} };
+    }
+
+    return {
+      props: {
+        profile: result.data.profile,
+      },
+    };
   } catch (error) {
-    return { initialProfile: null };
+    res.writeHead(302, { Location: '/404' });
+    res.end();
+    return { props: {} };
   }
-};
+}
 
 export default Profile;

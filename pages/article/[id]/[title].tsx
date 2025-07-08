@@ -1,7 +1,7 @@
 import ArticleMeta from '../../../features/article/ArticleMeta';
 import CommentList from '../../../features/comment/CommentList';
 import ArticleAPI from '../../../lib/api/article';
-import { ArticleType, ArticleResponse } from '../../../lib/types/articleType';
+import { ArticleType } from '../../../lib/types/articleType';
 
 function ArticleBanner({ article }: { article: ArticleType }) {
   return (
@@ -45,34 +45,46 @@ function CommentsSection() {
   );
 }
 
-function ArticlePage({ initialArticle }: { initialArticle: ArticleResponse }) {
+function ArticlePage({ article }: { article: ArticleType }) {
   return (
     <div className="article-page">
-      <ArticleBanner article={initialArticle.article} />
-
+      <ArticleBanner article={article} />
       <div className="container page">
-        <ArticleBody article={initialArticle.article} />
-
+        <ArticleBody article={article} />
         <hr />
-
         <CommentsSection />
       </div>
     </div>
   );
 }
 
-export async function getServerSideProps({ query }) {
+export async function getServerSideProps({ query, res }) {
   const { id } = query;
+
+  if (!id || isNaN(Number(id))) {
+    res.writeHead(302, { Location: '/404' });
+    res.end();
+    return { props: {} };
+  }
+
   try {
     const {
       data: { article },
     } = await ArticleAPI.get(id);
-    return { props: { initialArticle: { article } } };
-  } catch (error) {
-    console.error('Article fetch error:', error);
+    if (!article) {
+      res.writeHead(302, { Location: '/404' });
+      res.end();
+      return { props: {} };
+    }
     return {
-      notFound: true,
+      props: {
+        article: article,
+      },
     };
+  } catch (error) {
+    res.writeHead(302, { Location: '/404' });
+    res.end();
+    return { props: {} };
   }
 }
 
