@@ -56,7 +56,7 @@ function Settings({ user }) {
   );
 }
 
-export async function getServerSideProps(context) {
+export async function getServerSideProps() {
   try {
     const user = await getCurrentUserWithProfile();
     return {

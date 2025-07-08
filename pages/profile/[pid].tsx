@@ -4,7 +4,6 @@ import useSWR from 'swr';
 
 import ArticleList from '../../features/article/ArticleList';
 import CustomImage from '../../shared/components/CustomImage';
-import ErrorMessage from '../../shared/components/ErrorMessage';
 import Maybe from '../../shared/components/Maybe';
 import EditProfileButton from '../../features/profile/EditProfileButton';
 import FollowUserButton from '../../features/profile/FollowUserButton';
@@ -14,29 +13,24 @@ import checkLogin from '../../lib/utils/checkLogin';
 import { getCurrentUser } from '../../lib/utils/supabase/client';
 import { useFollowersCountByUserId } from '../../lib/hooks/useFollow';
 
-function Profile({ initialProfile }) {
+function Profile({ profile }) {
   const router = useRouter();
   const {
     query: { pid },
   } = router;
-  const decodedUsername = decodeURIComponent(String(pid));
-
-  const { data: fetchedProfile, error: profileError } = useSWR(
-    ['profile', decodedUsername],
-    () => UserAPI.get(decodedUsername),
-    { initialData: initialProfile },
+  const { data: fetchedProfile } = useSWR(
+    ['profile', pid],
+    () => UserAPI.get(String(pid)),
+    { initialData: { data: { profile }, status: 200 } },
   );
 
-  if (profileError) return <ErrorMessage message="Can't load profile" />;
+  const currentProfile = fetchedProfile?.data?.profile || profile;
 
-  const profile =
-    fetchedProfile?.data?.profile || initialProfile?.data?.profile;
-
-  const { user_id, username, bio, image, following } = profile;
+  const { user_id, username, bio, image } = currentProfile;
 
   const { data: currentUser } = useSWR('user', getCurrentUser);
   const isLoggedIn = checkLogin(currentUser);
-  const isUser =
+  const isLoggedinUser =
     currentUser && username === currentUser?.user_metadata?.username;
 
   const { data: followersCount } = useFollowersCountByUserId(user_id);
@@ -59,9 +53,9 @@ function Profile({ initialProfile }) {
                   팔로워 {followersCount || 0}명
                 </span>
               </div>
-              <EditProfileButton isUser={isUser} />
+              <EditProfileButton isUser={isLoggedinUser} />
               <Maybe test={isLoggedIn}>
-                <FollowUserButton isUser={isUser} username={username} />
+                <FollowUserButton isUser={isLoggedinUser} username={username} />
               </Maybe>
             </div>
           </div>
@@ -72,7 +66,7 @@ function Profile({ initialProfile }) {
         <div className="row">
           <div className="col-xs-12 col-md-10 offset-md-1">
             <div className="articles-toggle">
-              <ProfileTab profile={profile} />
+              <ProfileTab profile={currentProfile} />
             </div>
             <ArticleList />
           </div>
@@ -82,15 +76,22 @@ function Profile({ initialProfile }) {
   );
 }
 
-Profile.getInitialProps = async ({ query }) => {
+export async function getServerSideProps({ query, res }) {
   const { pid } = query;
   try {
-    const decodedUsername = decodeURIComponent(String(pid));
-    const result = await UserAPI.get(decodedUsername);
-    return { initialProfile: result };
+    const {
+      data: { profile },
+    } = await UserAPI.get(String(pid));
+    return {
+      props: {
+        profile: profile,
+      },
+    };
   } catch (error) {
-    console.error('Profile fetch error:', error);
+    res.writeHead(302, { Location: '/404' });
+    res.end();
+    return { props: {} };
   }
-};
+}
 
 export default Profile;

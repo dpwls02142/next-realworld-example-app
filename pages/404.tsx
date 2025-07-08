@@ -1,57 +1,27 @@
 import React from 'react';
-import { NextPageContext } from 'next';
 import Head from 'next/head';
 
-interface ErrorProps {
-  statusCode?: number;
-  hasGetInitialPropsRun?: boolean;
-  err?: Error;
-}
-
-const ErrorPage = ({ statusCode }: ErrorProps) => {
-  const getErrorMessage = () => {
-
-    if (statusCode === 500) {
-      return {
-        title: '서버 오류가 발생했습니다',
-        message:
-          '일시적인 서버 문제가 발생했습니다. 잠시 후 다시 시도해주세요.',
-        emoji: '🔧',
-      };
-    }
-
-    if (statusCode && statusCode >= 400 && statusCode < 500) {
-      return {
-        title: '요청 오류',
-        message: '잘못된 요청입니다. 다시 확인해주세요.',
-        emoji: '⚠️',
-      };
-    }
-
-    return {
-      title: '오류가 발생했습니다',
-      message: '예상치 못한 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
-      emoji: '😵',
-    };
-  };
-
-  const { title, message, emoji } = getErrorMessage();
-
+const Custom404 = () => {
   return (
     <>
       <Head>
-        <title>{statusCode ? `${statusCode} - ${title}` : title}</title>
-        <meta name="description" content={message} />
+        <title>404 - 페이지를 찾을 수 없습니다</title>
+        <meta
+          name="description"
+          content="요청하신 페이지가 존재하지 않거나 이동되었을 수 있습니다."
+        />
       </Head>
 
       <div className="error-page">
         <div className="error-content">
-          <div className="error-emoji">{emoji}</div>
+          <div className="error-emoji">🔍</div>
           <h1 className="error-title">
-            {statusCode && <span className="error-code">{statusCode}</span>}
-            {title}
+            <span className="error-code">404</span>
+            페이지를 찾을 수 없습니다
           </h1>
-          <p className="error-message">{message}</p>
+          <p className="error-message">
+            요청하신 페이지가 존재하지 않거나 이동되었을 수 있습니다.
+          </p>
 
           <div className="error-actions">
             <a href="/">홈으로 돌아가기</a>
@@ -127,21 +97,6 @@ const ErrorPage = ({ statusCode }: ErrorProps) => {
             flex-wrap: wrap;
           }
 
-          .error-details {
-            margin-top: 32px;
-            text-align: left;
-            background: #f7fafc;
-            border-radius: 8px;
-            padding: 16px;
-          }
-
-          .error-details summary {
-            cursor: pointer;
-            font-weight: 600;
-            color: #4a5568;
-            margin-bottom: 12px;
-          }
-
           @media (max-width: 640px) {
             .error-content {
               padding: 32px 24px;
@@ -165,9 +120,4 @@ const ErrorPage = ({ statusCode }: ErrorProps) => {
   );
 };
 
-ErrorPage.getInitialProps = ({ res, err }: NextPageContext) => {
-  const statusCode = res ? res.statusCode : err ? err.statusCode : 404;
-  return { statusCode };
-};
-
-export default ErrorPage;
+export default Custom404;
